@@ -39,11 +39,16 @@ export default function DashboardPage() {
           businessSnap.docs.map((doc) => {
             const data = doc.data() as Record<string, unknown>;
             const approvedFlag = data['approved'];
+            const name = typeof data['name'] === 'string' ? (data['name'] as string) : 'Untitled';
+            const description =
+              typeof data['description'] === 'string' ? (data['description'] as string) : '';
+            const plan = typeof data['plan'] === 'string' ? (data['plan'] as string) : 'free';
+
             return {
               id: doc.id,
-              name: (data['name'] as string?) ?? 'Untitled',
-              description: (data['description'] as string?) ?? '',
-              plan: (data['plan'] as string?) ?? 'free',
+              name,
+              description,
+              plan,
               approved: typeof approvedFlag === 'boolean' ? approvedFlag : false,
             };
           })
@@ -55,11 +60,15 @@ export default function DashboardPage() {
         setUsers(
           userSnap.docs.map((doc) => {
             const data = doc.data() as Record<string, unknown>;
+            const name = typeof data['name'] === 'string' ? (data['name'] as string) : '—';
+            const email = typeof data['email'] === 'string' ? (data['email'] as string) : 'unknown';
+            const role = typeof data['role'] === 'string' ? (data['role'] as string) : 'user';
+
             return {
               id: doc.id,
-              name: (data['name'] as string?) ?? '—',
-              email: (data['email'] as string?) ?? 'unknown',
-              role: (data['role'] as string?) ?? 'user',
+              name,
+              email,
+              role,
             };
           })
         );
