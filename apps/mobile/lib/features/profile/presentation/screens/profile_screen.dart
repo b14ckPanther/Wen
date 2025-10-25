@@ -266,10 +266,13 @@ class _AuthFormsCard extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final screenHeight = MediaQuery.of(context).size.height;
-                  final maxHeight = constraints.maxHeight.isFinite
+                  final availableHeight = constraints.maxHeight.isFinite
                       ? constraints.maxHeight
                       : screenHeight * 0.75;
-                  final formHeight = maxHeight.clamp(320.0, 520.0);
+                  // Tab bar height (~48) + spacing (24) should be considered when clamping.
+                  const tabBarHeight = 48.0;
+                  const gapHeight = 24.0;
+                  final formHeight = (availableHeight - tabBarHeight - gapHeight).clamp(280.0, 520.0);
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -279,7 +282,7 @@ class _AuthFormsCard extends StatelessWidget {
                           Tab(text: l10n.authSignUpTab),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: gapHeight),
                       SizedBox(
                         height: formHeight,
                         child: TabBarView(
