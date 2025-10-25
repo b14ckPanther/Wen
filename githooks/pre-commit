@@ -1,0 +1,18 @@
+#!/bin/sh
+set -euo pipefail
+
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+MOBILE_DIR="$PROJECT_ROOT/apps/mobile"
+
+if [ ! -d "$MOBILE_DIR" ]; then
+  echo "[pre-commit] mobile app directory not found; skipping Flutter checks." >&2
+  exit 0
+fi
+
+cd "$MOBILE_DIR"
+
+# Format Dart sources and fail if changes are required.
+dart format --set-exit-if-changed lib test
+
+# Run analyzer to keep the tree clean.
+flutter analyze

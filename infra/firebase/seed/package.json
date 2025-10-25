@@ -1,0 +1,12 @@
+{
+  "name": "wen-firebase-seed",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Seeder for Wen Firebase emulator/dev environments",
+  "scripts": {
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

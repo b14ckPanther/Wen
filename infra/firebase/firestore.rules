@@ -1,0 +1,193 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function currentUserId() {
+      return request.auth.uid;
+    }
+
+    function currentUserDoc() {
+      return get(/databases/$(database)/documents/users/$(currentUserId()));
+    }
+
+    function currentUserRole() {
+      return isSignedIn() ? currentUserDoc().data.role : null;
+    }
+
+    function isAdmin() {
+      return currentUserRole() == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && userId == currentUserId();
+    }
+
+    function requestHasKeys(keys) {
+      return request.resource.data.keys().hasOnly(keys);
+    }
+
+    function ensureServerTimestamp(field) {
+      return (request.method == 'create' && request.resource.data[field] == request.time)
+        || (request.method != 'create' && resource.data[field] == request.resource.data[field]);
+    }
+
+    function validPlan(plan) {
+      return plan in ['free', 'standard', 'premium'];
+    }
+
+    function validBusinessPayload() {
+      return requestHasKeys([
+          'name',
+          'description',
+          'categoryId',
+          'location',
+          'ownerId',
+          'plan',
+        'images',
+        'approved',
+        'createdAt',
+        'updatedAt',
+        'searchKeywords'
+      ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.description is string
+        && request.resource.data.categoryId is string
+      && request.resource.data.ownerId is string
+        && request.resource.data.location is latlng
+      && request.resource.data.images is list
+      && request.resource.data.images.size() <= 12
+      && (!request.resource.data.keys().hasAny(['searchKeywords'])
+          || request.resource.data.searchKeywords is list)
+      && request.resource.data.approved is bool
+      && validPlan(request.resource.data.plan)
+      && request.resource.data.createdAt is timestamp
+      && request.resource.data.updatedAt is timestamp;
+    }
+
+    function ownerUpdatingOwnBusiness() {
+      return isSignedIn()
+        && resource.data.ownerId == currentUserId()
+        && request.resource.data.ownerId == currentUserId();
+    }
+
+    function validUserPayload() {
+      return requestHasKeys([
+          'name',
+          'email',
+          'role',
+          'plan',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.email is string
+        && request.resource.data.role in ['user', 'owner', 'admin']
+        && validPlan(request.resource.data.plan)
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    function validTransactionPayload() {
+      return requestHasKeys([
+          'userId',
+          'plan',
+          'status',
+          'amount',
+          'createdAt'
+        ])
+        && request.resource.data.userId is string
+        && validPlan(request.resource.data.plan)
+        && request.resource.data.status in ['pending', 'succeeded', 'failed']
+        && request.resource.data.amount is number
+        && request.resource.data.amount >= 0
+        && request.resource.data.createdAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow create: if validUserPayload()
+        && (
+          (isOwner(userId) && request.resource.data.role in ['user', 'owner'])
+          || isAdmin()
+        )
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if validUserPayload()
+        && ensureServerTimestamp('createdAt')
+        && request.resource.data.updatedAt == request.time
+        && (
+          (isOwner(userId)
+            && resource.data.role in ['user', 'owner']
+            && request.resource.data.role in ['user', 'owner'])
+          || isAdmin()
+        );
+
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /businesses/{businessId} {
+      allow get, list: if resource.data.approved == true
+        || isAdmin()
+        || (isSignedIn() && resource.data.ownerId == currentUserId());
+
+      allow create: if validBusinessPayload()
+        && (
+          (isAdmin())
+          || (isSignedIn()
+            && request.resource.data.ownerId == currentUserId()
+            && request.resource.data.approved == false)
+        )
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if validBusinessPayload()
+        && ensureServerTimestamp('createdAt')
+        && request.resource.data.updatedAt == request.time
+        && (
+          isAdmin()
+          || (ownerUpdatingOwnBusiness()
+            && request.resource.data.approved == resource.data.approved
+            && request.resource.data.plan == resource.data.plan)
+        );
+
+      allow delete: if isAdmin() || ownerUpdatingOwnBusiness();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+
+      allow create, update, delete: if isAdmin()
+        || (isSignedIn()
+          && request.resource.data.businessId is string
+          && exists(/databases/$(database)/documents/businesses/$(request.resource.data.businessId))
+          && get(/databases/$(database)/documents/businesses/$(request.resource.data.businessId)).data.ownerId == currentUserId()
+          && (request.method == 'create' || resource.data.businessId == request.resource.data.businessId));
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.userId == currentUserId());
+
+      allow create: if isSignedIn()
+        && validTransactionPayload()
+        && request.resource.data.userId == currentUserId()
+        && request.resource.data.createdAt == request.time;
+
+      allow update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

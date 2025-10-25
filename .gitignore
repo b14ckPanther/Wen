@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+
+# Flutter & Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+**/build/
+**/ios/Flutter/.last_build_id
+
+# Firebase Emulator & generated configs
+firebase-debug.log
+firebase-export-*/
+infra/.firebaserc.local
+infra/.firebase/
+infra/firebase/.data/
+apps/mobile/android/app/google-services.json
+apps/mobile/ios/Runner/GoogleService-Info.plist
+apps/mobile/android/app/src/main/res/values/google_maps_api.xml
+
+# Env files
+*.env
+*.env.*
+
+# Node
+node_modules/
+
+# IDEs
+.idea/
+.vscode/
+
+# Logs
+*.log

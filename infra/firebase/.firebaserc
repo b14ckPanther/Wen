@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "wen-dev-noor"
+  },
+  "targets": {
+    "wen-dev-noor": {
+      "storage": {
+        "rules": [
+          "gs://wen-dev-noor.firebasestorage.app"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
