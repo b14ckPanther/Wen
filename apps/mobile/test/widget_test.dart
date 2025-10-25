@@ -57,7 +57,7 @@ void main() {
 
     final repository = BusinessRepository(
       fakeFirestore,
-      FirebaseStorage.instanceFor(bucket: 'gs://stub-bucket'),
+      storage: FirebaseStorage.instanceFor(bucket: 'gs://stub-bucket'),
     );
 
     await tester.pumpWidget(

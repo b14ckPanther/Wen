@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/business.dart';
 import '../data/repositories/business_repository.dart';
 
 final businessRepositoryProvider = Provider<BusinessRepository>((ref) {
-  return BusinessRepository(FirebaseFirestore.instance);
+  return BusinessRepository(
+    FirebaseFirestore.instance,
+    functions: FirebaseFunctions.instance,
+  );
 });
 
 final businessCategoriesProvider = StreamProvider.autoDispose(

@@ -1,8 +1,9 @@
 import 'dart:collection';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 
 import '../../domain/business_query_filters.dart';
@@ -35,11 +36,16 @@ class _CacheEntry {
 }
 
 class BusinessRepository {
-  BusinessRepository(this._firestore, [FirebaseStorage? storage])
-    : _storage = storage ?? FirebaseStorage.instance;
+  BusinessRepository(
+    this._firestore, {
+    FirebaseStorage? storage,
+    FirebaseFunctions? functions,
+  })  : _storage = storage ?? FirebaseStorage.instance,
+        _functions = functions ?? FirebaseFunctions.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
+  final FirebaseFunctions _functions;
 
   CollectionReference<Map<String, dynamic>> get _collection =>
       _firestore.collection('businesses');
@@ -273,10 +279,17 @@ class BusinessRepository {
   }
 
   Future<void> approveBusiness(String businessId) async {
-    await _collection.doc(businessId).update({
-      'approved': true,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    final callable = _functions.httpsCallable('approveBusiness');
+    try {
+      await callable.call({'businessId': businessId});
+    } on FirebaseFunctionsException catch (error) {
+      throw Exception('Failed to approve business: ${error.message}');
+    } on MissingPluginException {
+      await _collection.doc(businessId).update({
+        'approved': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    }
     clearCache();
   }
 }
