@@ -4,6 +4,7 @@
   "engines": {
     "node": "18"
   },
+  "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
     "lint": "eslint --ext .ts src",
