@@ -1,7 +1,10 @@
+import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import {enqueueDocument} from './ai/embeddingQueue';
 import {syncEmbeddingsBatch} from './ai/syncEmbeddings';
 import {approveBusinessCallable} from './admin/approveBusiness';
+
+admin.initializeApp();
 
 export const onBusinessChange = functions.firestore
     .document('businesses/{businessId}')
