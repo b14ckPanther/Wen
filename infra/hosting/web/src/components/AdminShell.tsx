@@ -13,7 +13,7 @@ export function AdminShell({ children }: AdminShellProps) {
   const { user, signOut } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100">
+    <div className="min-h-screen bg-admin-gradient font-sans text-slate-100">
       <header className="sticky top-0 z-20 backdrop-blur bg-slate-900/80 border-b border-slate-700">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link href="/dashboard" className="text-xl font-semibold tracking-wide">

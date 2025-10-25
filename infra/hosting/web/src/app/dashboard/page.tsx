@@ -1,12 +1,15 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';
 
 import { AdminShell } from '../../components/AdminShell';
 import { useAuth } from '../../hooks/useAuth';
 import { db } from '../../lib/firebase';
-import { collection, getDocs, orderBy, query, limit } from 'firebase/firestore';
 
 interface BusinessRow {
   id: string;
@@ -23,6 +26,51 @@ interface UserRow {
   role: string;
 }
 
+function StatCard({
+  label,
+  value,
+  trend,
+  accent,
+}: {
+  label: string;
+  value: string;
+  trend: string;
+  accent: string;
+}) {
+  return (
+    <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 px-6 py-5 transition hover:border-white/20 hover:bg-white/10">
+      <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900/40 text-lg">
+        {accent}
+      </span>
+      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</div>
+      <div className="text-3xl font-semibold text-white">{value}</div>
+      <p className="text-xs text-slate-300">{trend}</p>
+    </div>
+  );
+}
+
+function EmptyState({ col, message }: { col: number; message: string }) {
+  return (
+    <tr>
+      <td colSpan={col} className="px-4 py-8 text-center text-sm text-slate-400">
+        {message}
+      </td>
+    </tr>
+  );
+}
+
+function StatusBadge({ approved }: { approved: boolean }) {
+  return approved ? (
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-200">
+      <span className="h-2 w-2 rounded-full bg-emerald-400" />Approved
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-200">
+      <span className="h-2 w-2 rounded-full bg-amber-400" />Pending review
+    </span>
+  );
+}
+
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
@@ -35,45 +83,34 @@ export default function DashboardPage() {
         const businessSnap = await getDocs(
           query(collection(db, 'businesses'), orderBy('updatedAt', 'desc'), limit(10))
         );
-        setBusinesses(
-          businessSnap.docs.map((doc) => {
-            const data = doc.data() as Record<string, unknown>;
-            const approvedFlag = data['approved'];
-            const name = typeof data['name'] === 'string' ? (data['name'] as string) : 'Untitled';
-            const description =
-              typeof data['description'] === 'string' ? (data['description'] as string) : '';
-            const plan = typeof data['plan'] === 'string' ? (data['plan'] as string) : 'free';
-
-            return {
-              id: doc.id,
-              name,
-              description,
-              plan,
-              approved: typeof approvedFlag === 'boolean' ? approvedFlag : false,
-            };
-          })
-        );
+        const businessRows = businessSnap.docs.map((doc) => {
+          const data = doc.data() as Record<string, unknown>;
+          return {
+            id: doc.id,
+            name: (data.name as string) ?? 'Untitled listing',
+            description: (data.description as string) ?? 'Description not provided.',
+            plan: (data.plan as string) ?? 'free',
+            approved: Boolean(data.approved),
+          };
+        });
 
         const userSnap = await getDocs(
           query(collection(db, 'users'), orderBy('updatedAt', 'desc'), limit(10))
         );
-        setUsers(
-          userSnap.docs.map((doc) => {
-            const data = doc.data() as Record<string, unknown>;
-            const name = typeof data['name'] === 'string' ? (data['name'] as string) : '—';
-            const email = typeof data['email'] === 'string' ? (data['email'] as string) : 'unknown';
-            const role = typeof data['role'] === 'string' ? (data['role'] as string) : 'user';
+        const userRows = userSnap.docs.map((doc) => {
+          const data = doc.data() as Record<string, unknown>;
+          return {
+            id: doc.id,
+            name: (data.name as string) ?? '—',
+            email: (data.email as string) ?? 'unknown@wen.app',
+            role: (data.role as string) ?? 'user',
+          };
+        });
 
-            return {
-              id: doc.id,
-              name,
-              email,
-              role,
-            };
-          })
-        );
+        setBusinesses(businessRows);
+        setUsers(userRows);
       } catch (error) {
-        console.error('Failed to load admin data', error);
+        console.error('Failed to load admin dashboard data', error);
       } finally {
         setFetching(false);
       }
@@ -83,6 +120,9 @@ export default function DashboardPage() {
       loadData();
     }
   }, [user]);
+
+  const pendingBusinesses = useMemo(() => businesses.filter((b) => !b.approved), [businesses]);
+  const activeOwners = useMemo(() => users.filter((u) => u.role === 'owner').length, [users]);
 
   if (loading) {
     return (
@@ -102,161 +142,152 @@ export default function DashboardPage() {
 
   return (
     <AdminShell>
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl">
-        <h2 className="text-2xl font-semibold tracking-wide text-white">Quick Stats</h2>
-        <p className="mt-2 max-w-2xl text-sm text-slate-300">
-          Review newly onboarded businesses, verify ownership data, and ensure the directory stays premium.
-        </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <StatCard label="Businesses reviewed" value="32" trend="+5 this week" />
-          <StatCard label="Pending approvals" value="8" trend="2 require docs" highlight />
-          <StatCard label="Premium plan uptake" value="46%" trend="+3.2% vs last month" />
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 px-8 py-10 shadow-2xl">
+        <div className="absolute -right-40 -top-40 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-sky-500/25 blur-3xl" />
+
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-300/70">
+              Admin overview
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold text-white lg:text-4xl">
+              Welcome back, {user.displayName ?? 'Wen Team'}
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm text-slate-300">
+              Monitor new submissions, track owners, and keep premium listings curated.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-6">
+            <StatCard
+              label="Businesses reviewed"
+              value={businesses.length.toString()}
+              trend="Latest 10 submissions"
+              accent="📋"
+            />
+            <StatCard
+              label="Pending approvals"
+              value={pendingBusinesses.length.toString()}
+              trend={pendingBusinesses.length ? 'Review queued listings' : 'All caught up!'}
+              accent="🛡️"
+            />
+            <StatCard
+              label="Active owners"
+              value={activeOwners.toString()}
+              trend="Owners with a live business"
+              accent="🏪"
+            />
+          </div>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-white">Recent businesses</h3>
-          <Link href="#" className="text-sm text-sky-300 hover:text-sky-200">
-            View all
-          </Link>
-        </div>
-        <p className="mt-2 text-sm text-slate-300">
-          Approve, flag, or contact owners directly. Geo coverage shown in plan column.
-        </p>
-        <div className="mt-6 overflow-x-auto">
-          <table className="min-w-full divide-y divide-white/10 text-left text-sm">
-            <thead>
-              <tr className="text-slate-300">
-                <th className="px-4 py-3 font-medium">Business</th>
-                <th className="px-4 py-3 font-medium">Plan</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5 text-slate-100">
-              {fetching && businesses.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
-                    Loading businesses…
-                  </td>
-                </tr>
-              ) : businesses.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
-                    No businesses found yet.
-                  </td>
-                </tr>
-              ) : (
-                businesses.map((business) => (
-                  <tr key={business.id}>
-                    <td className="px-4 py-4">
-                      <div className="font-semibold">{business.name}</div>
-                      <div className="mt-1 max-w-md text-xs text-slate-300 line-clamp-2">
-                        {business.description || 'No description provided.'}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="rounded-full bg-sky-500/10 px-3 py-1 text-xs text-sky-200">
-                        {business.plan}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      {business.approved ? (
-                        <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
-                          Approved
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs text-amber-200">
-                          Pending review
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 text-right text-xs text-slate-300">
-                      <button className="rounded-full border border-white/20 px-3 py-1 hover:border-sky-300 hover:text-sky-200">
-                        Open details
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <div className="grid gap-8 lg:grid-cols-[2fr,1fr]">
+        <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-white">Latest submissions</h2>
+              <p className="text-sm text-slate-300">Businesses ordered by most recent activity.</p>
+            </div>
+            <Link
+              href="#"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-600/60 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-300/80 hover:text-white"
+            >
+              View directory
+            </Link>
+          </div>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-white">Latest users</h3>
-          <Link href="#" className="text-sm text-sky-300 hover:text-sky-200">
+          <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+            <table className="min-w-full divide-y divide-white/10 text-left text-sm">
+              <thead className="bg-white/5 text-slate-300">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Business</th>
+                  <th className="px-4 py-3 font-medium">Plan</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 text-right font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 bg-slate-900/10 text-slate-100">
+                {fetching && businesses.length === 0 ? (
+                  <EmptyState col={4} message="Syncing latest submissions…" />
+                ) : businesses.length === 0 ? (
+                  <EmptyState col={4} message="No businesses found yet." />
+                ) : (
+                  businesses.map((business) => (
+                    <tr key={business.id} className="transition hover:bg-white/5">
+                      <td className="px-4 py-4">
+                        <div className="font-semibold text-white">{business.name}</div>
+                        <div className="mt-1 line-clamp-2 max-w-xl text-xs text-slate-300">
+                          {business.description}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="inline-flex rounded-full bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
+                          {business.plan}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <StatusBadge approved={business.approved} />
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <button className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-xs text-slate-200 transition hover:border-sky-300 hover:text-sky-200">
+                          Open details
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl">
+          <div>
+            <h2 className="text-xl font-semibold text-white">Owner spotlight</h2>
+            <p className="mt-1 text-sm text-slate-300">
+              Latest team members. Promote verified owners to premium tiers.
+            </p>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-white/10">
+            <table className="min-w-full divide-y divide-white/10 text-left text-sm">
+              <thead className="bg-white/5 text-slate-300">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Name</th>
+                  <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium">Role</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 bg-slate-900/10 text-slate-100">
+                {fetching && users.length === 0 ? (
+                  <EmptyState col={3} message="Fetching team members…" />
+                ) : users.length === 0 ? (
+                  <EmptyState col={3} message="No users yet." />
+                ) : (
+                  users.map((row) => (
+                    <tr key={row.id} className="transition hover:bg-white/5">
+                      <td className="px-4 py-4 font-semibold text-white">{row.name}</td>
+                      <td className="px-4 py-4 text-xs text-slate-300">{row.email}</td>
+                      <td className="px-4 py-4">
+                        <span className="inline-flex rounded-full bg-purple-400/15 px-3 py-1 text-xs font-medium text-purple-200">
+                          {row.role}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <Link
+            href="#"
+            className="inline-flex items-center justify-center rounded-full border border-slate-600/50 px-4 py-2 text-xs font-medium text-slate-200 transition hover:border-slate-300/80 hover:text-white"
+          >
             Manage roles
           </Link>
-        </div>
-        <div className="mt-6 overflow-x-auto">
-          <table className="min-w-full divide-y divide-white/10 text-left text-sm">
-            <thead>
-              <tr className="text-slate-300">
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Role</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5 text-slate-100">
-              {fetching && users.length === 0 ? (
-                <tr>
-                  <td colSpan={3} className="px-4 py-6 text-center text-slate-400">
-                    Loading users…
-                  </td>
-                </tr>
-              ) : users.length === 0 ? (
-                <tr>
-                  <td colSpan={3} className="px-4 py-6 text-center text-slate-400">
-                    No users found.
-                  </td>
-                </tr>
-              ) : (
-                users.map((userRow) => (
-                  <tr key={userRow.id}>
-                    <td className="px-4 py-4 font-semibold">{userRow.name}</td>
-                    <td className="px-4 py-4 text-slate-300">{userRow.email}</td>
-                    <td className="px-4 py-4">
-                      <span className="rounded-full bg-purple-500/10 px-3 py-1 text-xs text-purple-200">
-                        {userRow.role}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+        </section>
+      </div>
     </AdminShell>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  trend,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  trend: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-3xl border px-4 py-6 text-sm transition ${
-        highlight
-          ? 'border-amber-400/40 bg-amber-500/10 text-amber-100 shadow-lg shadow-amber-500/30'
-          : 'border-white/10 bg-white/5 text-slate-200'
-      }`}
-    >
-      <div className="text-xs uppercase tracking-wide opacity-70">{label}</div>
-      <div className="mt-2 text-3xl font-semibold">{value}</div>
-      <div className="mt-1 text-xs opacity-70">{trend}</div>
-    </div>
   );
 }

@@ -12,7 +12,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="min-h-screen bg-admin-gradient font-sans text-slate-100">
+        {children}
+      </body>
     </html>
   );
 }

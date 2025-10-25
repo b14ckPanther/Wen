@@ -34,5 +34,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_WEN_DEV_NOOR }}
           channelId: live
           projectId: wen-dev-noor
-          entryPoint: infra/firebase
-
+          entryPoint: .

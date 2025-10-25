@@ -4,14 +4,19 @@ module.exports = {
     es6: true,
     node: true,
   },
-  extends: ['eslint:recommended', 'google'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: ['tsconfig.json'],
+    ecmaVersion: 2020,
+    sourceType: 'module',
   },
   plugins: ['@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended'
+  ],
   rules: {
-    'quotes': ['error', 'single'],
-    'max-len': ['error', { 'code': 100 }],
-  },
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-explicit-any': 'off'
+  }
 };
