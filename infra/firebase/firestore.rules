@@ -114,13 +114,11 @@ service cloud.firestore {
         && (
           (isOwner(userId) && request.resource.data.role in ['user', 'owner'])
           || isAdmin()
-        )
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.updatedAt == request.time;
+        );
 
       allow update: if validUserPayload()
         && ensureServerTimestamp('createdAt')
-        && request.resource.data.updatedAt == request.time
+        && request.resource.data.updatedAt is timestamp
         && (
           (isOwner(userId)
             && resource.data.role in ['user', 'owner']
