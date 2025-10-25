@@ -20,7 +20,9 @@ The `.env.example` file lists all required Firebase web config keys. Copy it to 
 
 ```bash
 npm run build
-# copy the out/ directory into infra/firebase/web-dist or deploy directly with CI
+# copy the static export into Firebase hosting folder
+rm -rf ../../firebase/web-dist && mkdir -p ../../firebase/web-dist
+cp -R out/. ../../firebase/web-dist/
 cd ../../firebase
 firebase deploy --only hosting --project wen-dev-noor
 ```
@@ -39,4 +41,4 @@ The CI workflows expect these repository secrets so the Next.js build can initia
 
 ## Notes
 - Authentication currently allows any Google account; restrict domain in Firebase console.
-- Moderation actions are read-only stubs for now (see `docs/admin-portal-plan.md` for roadmap).
+- Admin actions (approvals & role updates) call Firebase Functions / Firestore directly; see `app/dashboard/page.tsx`.

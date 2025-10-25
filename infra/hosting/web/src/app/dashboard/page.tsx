@@ -5,11 +5,12 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
-import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';
+import { collection, doc, getDocs, limit, orderBy, query, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 
 import { AdminShell } from '../../components/AdminShell';
 import { useAuth } from '../../hooks/useAuth';
-import { db } from '../../lib/firebase';
+import { db, functions } from '../../lib/firebase';
 
 interface BusinessRow {
   id: string;
@@ -76,6 +77,10 @@ export default function DashboardPage() {
   const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [fetching, setFetching] = useState(true);
+  const [activeBusinessAction, setActiveBusinessAction] = useState<string | null>(null);
+  const [activeRoleAction, setActiveRoleAction] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     async function loadData() {
@@ -121,6 +126,12 @@ export default function DashboardPage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (!feedback) return;
+    const timeout = setTimeout(() => setFeedback(null), 4000);
+    return () => clearTimeout(timeout);
+  }, [feedback]);
+
   const pendingBusinesses = useMemo(() => businesses.filter((b) => !b.approved), [businesses]);
   const activeOwners = useMemo(() => users.filter((u) => u.role === 'owner').length, [users]);
 
@@ -140,8 +151,58 @@ export default function DashboardPage() {
     );
   }
 
+  const approveBusiness = async (businessId: string) => {
+    try {
+      setActiveBusinessAction(businessId);
+      const callable = httpsCallable(functions, 'approveBusiness');
+      await callable({ businessId });
+      setBusinesses((prev) =>
+        prev.map((item) => (item.id === businessId ? { ...item, approved: true } : item))
+      );
+      setFeedback('Business approved successfully.');
+      setFeedbackTone('success');
+    } catch (error: any) {
+      console.error('Failed to approve business', error);
+      setFeedback(error?.message ?? 'Failed to approve business.');
+      setFeedbackTone('error');
+    } finally {
+      setActiveBusinessAction(null);
+    }
+  };
+
+  const updateUserRole = async (userId: string, role: string) => {
+    try {
+      setActiveRoleAction(userId);
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        role,
+        updatedAt: serverTimestamp(),
+      });
+      setUsers((prev) => prev.map((item) => (item.id === userId ? { ...item, role } : item)));
+      setFeedback('Role updated successfully.');
+      setFeedbackTone('success');
+    } catch (error: any) {
+      console.error('Failed to update role', error);
+      setFeedback(error?.message ?? 'Unable to update role.');
+      setFeedbackTone('error');
+    } finally {
+      setActiveRoleAction(null);
+    }
+  };
+
   return (
     <AdminShell>
+      {feedback ? (
+        <div
+          className={`rounded-2xl border px-4 py-3 text-sm shadow-lg md:max-w-lg ${
+            feedbackTone === 'success'
+              ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-100'
+              : 'border-rose-400/40 bg-rose-500/10 text-rose-100'
+          }`}
+        >
+          {feedback}
+        </div>
+      ) : null}
       <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 px-8 py-10 shadow-2xl">
         <div className="absolute -right-40 -top-40 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
         <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-sky-500/25 blur-3xl" />
@@ -229,9 +290,19 @@ export default function DashboardPage() {
                         <StatusBadge approved={business.approved} />
                       </td>
                       <td className="px-4 py-4 text-right">
-                        <button className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-xs text-slate-200 transition hover:border-sky-300 hover:text-sky-200">
-                          Open details
-                        </button>
+                        {business.approved ? (
+                          <button className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-xs text-slate-400" disabled>
+                            Approved
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => approveBusiness(business.id)}
+                            disabled={activeBusinessAction === business.id}
+                            className="inline-flex items-center gap-2 rounded-full border border-sky-500/40 px-3 py-1 text-xs text-sky-200 transition hover:border-sky-300 hover:text-sky-100 disabled:cursor-not-allowed disabled:border-slate-600/40 disabled:text-slate-400"
+                          >
+                            {activeBusinessAction === business.id ? 'Approving…' : 'Approve'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -268,14 +339,21 @@ export default function DashboardPage() {
                     <tr key={row.id} className="transition hover:bg-white/5">
                       <td className="px-4 py-4 font-semibold text-white">{row.name}</td>
                       <td className="px-4 py-4 text-xs text-slate-300">{row.email}</td>
-                      <td className="px-4 py-4">
-                        <span className="inline-flex rounded-full bg-purple-400/15 px-3 py-1 text-xs font-medium text-purple-200">
-                          {row.role}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                    <td className="px-4 py-4">
+                      <select
+                        className="rounded-full border border-white/20 bg-slate-900/40 px-3 py-1 text-xs text-slate-100 focus:border-sky-400 focus:outline-none"
+                        value={row.role}
+                        onChange={(event) => updateUserRole(row.id, event.target.value)}
+                        disabled={activeRoleAction === row.id}
+                      >
+                        <option value="user">user</option>
+                        <option value="owner">owner</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              )}
               </tbody>
             </table>
           </div>
