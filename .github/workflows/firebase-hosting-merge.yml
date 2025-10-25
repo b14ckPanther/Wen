@@ -28,6 +28,12 @@ jobs:
         run: npm run build
         working-directory: infra/hosting/web
 
+      - name: Export static site
+        run: |
+          rm -rf infra/firebase/web-dist
+          mkdir -p infra/firebase/web-dist
+          cp -R infra/hosting/web/out/. infra/firebase/web-dist/
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
