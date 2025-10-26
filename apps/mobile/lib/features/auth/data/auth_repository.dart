@@ -30,14 +30,20 @@ class AuthRepository {
 
     final uid = credential.user!.uid;
     final now = Timestamp.now();
-    await _firestore.collection('users').doc(uid).set({
+    final data = <String, dynamic>{
       'name': name,
       'email': email,
-      'role': asOwner ? 'owner' : 'user',
+      'role': 'user',
       'plan': 'free',
       'createdAt': now,
       'updatedAt': now,
-    });
+      'roleStatus': asOwner ? 'pending' : 'active',
+    };
+    if (asOwner) {
+      data['requestedRole'] = 'owner';
+    }
+
+    await _firestore.collection('users').doc(uid).set(data);
   }
 
   Future<void> sendPasswordReset({required String email}) async {
@@ -71,9 +77,36 @@ class AuthRepository {
       throw ArgumentError.value(role, 'role', 'Invalid user role');
     }
 
-    final data = Map<String, dynamic>.from(currentData)
-      ..['role'] = role
-      ..['updatedAt'] = Timestamp.now();
+    final now = Timestamp.now();
+    final data = Map<String, dynamic>.from(currentData);
+
+    data['name'] ??= _auth.currentUser?.displayName ?? '';
+    data['email'] ??= _auth.currentUser?.email ?? '';
+    data['plan'] ??= 'free';
+    data['createdAt'] ??= now;
+    data['role'] = role;
+    data['updatedAt'] = now;
+    data['roleStatus'] = 'active';
+    data.remove('requestedRole');
+
+    await _firestore.collection('users').doc(uid).set(data);
+  }
+
+  Future<void> requestOwnerUpgrade({
+    required Map<String, dynamic> currentData,
+  }) async {
+    final uid = _auth.currentUser!.uid;
+    final now = Timestamp.now();
+    final data = Map<String, dynamic>.from(currentData);
+
+    data['name'] ??= _auth.currentUser?.displayName ?? '';
+    data['email'] ??= _auth.currentUser?.email ?? '';
+    data['plan'] ??= 'free';
+    data['role'] ??= 'user';
+    data['createdAt'] ??= now;
+    data['roleStatus'] = 'pending';
+    data['requestedRole'] = 'owner';
+    data['updatedAt'] = now;
 
     await _firestore.collection('users').doc(uid).set(data);
   }

@@ -26,7 +26,30 @@ class AdminRepository {
 
     await _usersCollection.doc(userId).update({
       'role': role,
+      'roleStatus': 'active',
+      'requestedRole': FieldValue.delete(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<void> approveOwnerRequest({required String userId}) async {
+    await _usersCollection.doc(userId).update({
+      'role': 'owner',
+      'roleStatus': 'active',
+      'requestedRole': FieldValue.delete(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> rejectOwnerRequest({required String userId}) async {
+    await _usersCollection.doc(userId).update({
+      'roleStatus': 'rejected',
+      'requestedRole': FieldValue.delete(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteUser({required String userId}) async {
+    await _usersCollection.doc(userId).delete();
   }
 }

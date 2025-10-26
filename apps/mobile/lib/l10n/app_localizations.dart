@@ -137,6 +137,12 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get tabProfile;
 
+  /// No description provided for @adminConsoleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin Console'**
+  String get adminConsoleTitle;
+
   /// No description provided for @exploreHeadline.
   ///
   /// In en, this message translates to:
@@ -377,17 +383,35 @@ abstract class AppLocalizations {
   /// **'Sign out'**
   String get authSignOut;
 
-  /// No description provided for @authBecomeOwner.
+  /// No description provided for @authOwnerRequestButton.
   ///
   /// In en, this message translates to:
-  /// **'Become a business owner'**
-  String get authBecomeOwner;
+  /// **'Request owner access'**
+  String get authOwnerRequestButton;
 
-  /// No description provided for @authBecomeOwnerSubtitle.
+  /// No description provided for @authOwnerRequestSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Owners can manage business listings in Wen'**
-  String get authBecomeOwnerSubtitle;
+  /// **'Owners can manage listings after an admin approves.'**
+  String get authOwnerRequestSubtitle;
+
+  /// No description provided for @authOwnerRequestSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Request received. We’ll notify you once an admin approves.'**
+  String get authOwnerRequestSubmitted;
+
+  /// No description provided for @authOwnerRequestPending.
+  ///
+  /// In en, this message translates to:
+  /// **'We received your request. An admin review is required before you can publish a business.'**
+  String get authOwnerRequestPending;
+
+  /// No description provided for @authOwnerRequestRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Your previous request was declined. Update your details and submit again when ready.'**
+  String get authOwnerRequestRejected;
 
   /// No description provided for @authManageBusiness.
   ///
@@ -647,6 +671,102 @@ abstract class AppLocalizations {
   /// **'Open admin console'**
   String get adminConsoleButton;
 
+  /// No description provided for @adminPendingBusinessesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending businesses'**
+  String get adminPendingBusinessesTitle;
+
+  /// No description provided for @adminPendingBusinessesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No businesses awaiting approval.'**
+  String get adminPendingBusinessesEmpty;
+
+  /// No description provided for @adminApproveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get adminApproveAction;
+
+  /// No description provided for @adminRejectAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get adminRejectAction;
+
+  /// No description provided for @adminUsersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get adminUsersTitle;
+
+  /// No description provided for @adminUsersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No users in the database yet.'**
+  String get adminUsersEmpty;
+
+  /// No description provided for @adminOwnerRequestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner access requests'**
+  String get adminOwnerRequestsTitle;
+
+  /// No description provided for @adminOwnerRequestsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No owner access requests at the moment.'**
+  String get adminOwnerRequestsEmpty;
+
+  /// No description provided for @adminOwnerRequestSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested owner access'**
+  String get adminOwnerRequestSubtitle;
+
+  /// No description provided for @adminAllUsersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All users'**
+  String get adminAllUsersTitle;
+
+  /// No description provided for @adminRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get adminRoleLabel;
+
+  /// No description provided for @adminStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get adminStatusLabel;
+
+  /// No description provided for @adminSetRoleUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Set role: user'**
+  String get adminSetRoleUser;
+
+  /// No description provided for @adminSetRoleOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Set role: owner'**
+  String get adminSetRoleOwner;
+
+  /// No description provided for @adminSetRoleAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Set role: admin'**
+  String get adminSetRoleAdmin;
+
+  /// No description provided for @adminDeleteUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete user'**
+  String get adminDeleteUser;
+
   /// No description provided for @paymentsUpgradeTitle.
   ///
   /// In en, this message translates to:
@@ -668,7 +788,7 @@ abstract class AppLocalizations {
   /// No description provided for @paymentsStandardPrice.
   ///
   /// In en, this message translates to:
-  /// **'AED 199/mo'**
+  /// **'₪ 199/mo'**
   String get paymentsStandardPrice;
 
   /// No description provided for @paymentsStandardBenefit1.
@@ -698,7 +818,7 @@ abstract class AppLocalizations {
   /// No description provided for @paymentsPremiumPrice.
   ///
   /// In en, this message translates to:
-  /// **'AED 399/mo'**
+  /// **'₪ 399/mo'**
   String get paymentsPremiumPrice;
 
   /// No description provided for @paymentsPremiumBenefit1.

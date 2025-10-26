@@ -38,6 +38,29 @@ service cloud.firestore {
       return plan in ['free', 'standard', 'premium'];
     }
 
+    function validRoleStatus(status) {
+      return status in ['active', 'pending', 'rejected'];
+    }
+
+    function validRequestedRole(role) {
+      return role == null || role == 'owner';
+    }
+
+    function ownerUserUpdateAllowed(userId) {
+      return isOwner(userId)
+        && resource.data.role in ['user', 'owner']
+        && request.resource.data.role == resource.data.role
+        && (
+          !request.resource.data.keys().hasAny(['requestedRole'])
+          || validRequestedRole(request.resource.data.requestedRole)
+        )
+        && (
+          !request.resource.data.keys().hasAny(['roleStatus'])
+          || request.resource.data.roleStatus == resource.data.roleStatus
+          || request.resource.data.roleStatus == 'pending'
+        );
+    }
+
     function validBusinessPayload() {
       return requestHasKeys([
           'name',
@@ -115,14 +138,22 @@ service cloud.firestore {
           'role',
           'plan',
           'createdAt',
-          'updatedAt'
+          'updatedAt',
+          'requestedRole',
+          'roleStatus'
         ])
         && request.resource.data.name is string
         && request.resource.data.email is string
         && request.resource.data.role in ['user', 'owner', 'admin']
         && validPlan(request.resource.data.plan)
         && request.resource.data.createdAt is timestamp
-        && request.resource.data.updatedAt is timestamp;
+        && request.resource.data.updatedAt is timestamp
+        && (!request.resource.data.keys().hasAny(['requestedRole'])
+          || (request.resource.data.requestedRole is string
+            && validRequestedRole(request.resource.data.requestedRole)))
+        && (!request.resource.data.keys().hasAny(['roleStatus'])
+          || (request.resource.data.roleStatus is string
+            && validRoleStatus(request.resource.data.roleStatus)));
     }
 
     function validTransactionPayload() {
@@ -154,9 +185,7 @@ service cloud.firestore {
         && ensureServerTimestamp('createdAt')
         && request.resource.data.updatedAt is timestamp
         && (
-          (isOwner(userId)
-            && resource.data.role in ['user', 'owner']
-            && request.resource.data.role in ['user', 'owner'])
+          ownerUserUpdateAllowed(userId)
           || isAdmin()
         );
 

@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabProfile => 'Profile';
 
   @override
+  String get adminConsoleTitle => 'Admin Console';
+
+  @override
   String get exploreHeadline => 'Discover trending businesses near you';
 
   @override
@@ -150,10 +153,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authSignOut => 'Sign out';
 
   @override
-  String get authBecomeOwner => 'Become a business owner';
+  String get authOwnerRequestButton => 'Request owner access';
 
   @override
-  String get authBecomeOwnerSubtitle => 'Owners can manage business listings in Wen';
+  String get authOwnerRequestSubtitle => 'Owners can manage listings after an admin approves.';
+
+  @override
+  String get authOwnerRequestSubmitted => 'Request received. We’ll notify you once an admin approves.';
+
+  @override
+  String get authOwnerRequestPending => 'We received your request. An admin review is required before you can publish a business.';
+
+  @override
+  String get authOwnerRequestRejected => 'Your previous request was declined. Update your details and submit again when ready.';
 
   @override
   String get authManageBusiness => 'Manage my business';
@@ -285,6 +297,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminConsoleButton => 'Open admin console';
 
   @override
+  String get adminPendingBusinessesTitle => 'Pending businesses';
+
+  @override
+  String get adminPendingBusinessesEmpty => 'No businesses awaiting approval.';
+
+  @override
+  String get adminApproveAction => 'Approve';
+
+  @override
+  String get adminRejectAction => 'Reject';
+
+  @override
+  String get adminUsersTitle => 'Users';
+
+  @override
+  String get adminUsersEmpty => 'No users in the database yet.';
+
+  @override
+  String get adminOwnerRequestsTitle => 'Owner access requests';
+
+  @override
+  String get adminOwnerRequestsEmpty => 'No owner access requests at the moment.';
+
+  @override
+  String get adminOwnerRequestSubtitle => 'Requested owner access';
+
+  @override
+  String get adminAllUsersTitle => 'All users';
+
+  @override
+  String get adminRoleLabel => 'Role';
+
+  @override
+  String get adminStatusLabel => 'Status';
+
+  @override
+  String get adminSetRoleUser => 'Set role: user';
+
+  @override
+  String get adminSetRoleOwner => 'Set role: owner';
+
+  @override
+  String get adminSetRoleAdmin => 'Set role: admin';
+
+  @override
+  String get adminDeleteUser => 'Delete user';
+
+  @override
   String get paymentsUpgradeTitle => 'Upgrade plan';
 
   @override
@@ -294,7 +354,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentsStandardPlan => 'Standard';
 
   @override
-  String get paymentsStandardPrice => 'AED 199/mo';
+  String get paymentsStandardPrice => '₪ 199/mo';
 
   @override
   String get paymentsStandardBenefit1 => 'Up to 5 team members';
@@ -309,7 +369,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentsPremiumPlan => 'Premium';
 
   @override
-  String get paymentsPremiumPrice => 'AED 399/mo';
+  String get paymentsPremiumPrice => '₪ 399/mo';
 
   @override
   String get paymentsPremiumBenefit1 => 'Unlimited staff accounts';

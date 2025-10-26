@@ -57,6 +57,11 @@ class ProfileScreen extends ConsumerWidget {
               final plan = data['plan'] as String? ?? 'free';
               final name = data['name'] as String? ?? user.displayName ?? '—';
               final email = user.email ?? '—';
+              final roleStatus = data['roleStatus'] as String? ?? 'active';
+              final requestedRole = data['requestedRole'] as String? ?? '';
+              final isOwnerPending =
+                  requestedRole == 'owner' && roleStatus == 'pending';
+              final isOwnerRejected = roleStatus == 'rejected';
               return ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
@@ -94,31 +99,100 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (role == 'user')
+                  if (role == 'user') ...[
+                    if (isOwnerPending)
+                      Card(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .tertiaryContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.hourglass_bottom,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onTertiaryContainer,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  l10n.authOwnerRequestPending,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onTertiaryContainer,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else if (isOwnerRejected)
+                      Card(
+                        color:
+                            Theme.of(context).colorScheme.errorContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onErrorContainer,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  l10n.authOwnerRequestRejected,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onErrorContainer,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 12),
                     OutlinedButton.icon(
-                      onPressed: () async {
-                        await ref
-                            .read(authRepositoryProvider)
-                            .updateUserRole(role: 'owner', currentData: data);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.businessOwnerUpgradeSuccess),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: isOwnerPending
+                          ? null
+                          : () async {
+                              await ref
+                                  .read(authRepositoryProvider)
+                                  .requestOwnerUpgrade(currentData: data);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text(l10n.authOwnerRequestSubmitted),
+                                  ),
+                                );
+                              }
+                            },
                       icon: const Icon(Icons.storefront_outlined),
-                      label: Text(l10n.authBecomeOwner),
+                      label: Text(l10n.authOwnerRequestButton),
                     ),
-                  if (role == 'user')
                     Padding(
                       padding: const EdgeInsets.only(top: 8, bottom: 16),
                       child: Text(
-                        l10n.authBecomeOwnerSubtitle,
+                        l10n.authOwnerRequestSubtitle,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
+                  ],
                   if (role == 'owner') ...[
                     OutlinedButton.icon(
                       onPressed: () {

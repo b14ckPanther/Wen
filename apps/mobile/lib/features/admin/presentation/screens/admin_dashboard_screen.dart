@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../businesses/application/business_repository_provider.dart';
 import '../../application/admin_providers.dart';
 
@@ -11,14 +12,15 @@ class AdminDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final usersAsync = ref.watch(adminUsersProvider);
     final pendingBusinessesAsync = ref.watch(pendingBusinessesProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Console')),
+      appBar: AppBar(title: Text(l10n.adminConsoleTitle)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
           Text(
-            'Pending businesses',
+            l10n.adminPendingBusinessesTitle,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
@@ -29,7 +31,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             error: (error, _) => Text(error.toString()),
             data: (businesses) {
               if (businesses.isEmpty) {
-                return const Text('No businesses awaiting approval.');
+                return Text(l10n.adminPendingBusinessesEmpty);
               }
               return Column(
                 children: businesses
@@ -45,7 +47,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                                   .approveBusiness(business.id);
                             },
                             icon: const Icon(Icons.check),
-                            label: const Text('Approve'),
+                            label: Text(l10n.adminApproveAction),
                           ),
                         ),
                       ),
@@ -56,7 +58,7 @@ class AdminDashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 32),
           Text(
-            'Users',
+            l10n.adminUsersTitle,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
@@ -67,46 +69,148 @@ class AdminDashboardScreen extends ConsumerWidget {
             error: (error, _) => Text(error.toString()),
             data: (users) {
               if (users.isEmpty) {
-                return const Text('No users in database yet.');
+                return Text(l10n.adminUsersEmpty);
               }
+
+              final pendingOwnerRequests = users
+                  .where(
+                    (user) => (user['requestedRole'] == 'owner' &&
+                        user['roleStatus'] == 'pending'),
+                  )
+                  .toList();
+
               return Column(
-                children: users
-                    .map(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (pendingOwnerRequests.isNotEmpty) ...[
+                    Text(
+                      l10n.adminOwnerRequestsTitle,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 12),
+                    ...pendingOwnerRequests.map(
                       (user) => Card(
                         child: ListTile(
                           title: Text(user['name'] as String? ?? '—'),
-                          subtitle: Text(user['email'] as String? ?? ''),
-                          trailing: PopupMenuButton<String>(
-                            onSelected: (role) async {
-                              await ref
-                                  .read(adminRepositoryProvider)
-                                  .updateUserRole(
-                                    userId: user['id'] as String,
-                                    role: role,
-                                  );
-                            },
-                            itemBuilder: (context) => const [
-                              PopupMenuItem(
-                                value: 'user',
-                                child: Text('Set role: user'),
-                              ),
-                              PopupMenuItem(
-                                value: 'owner',
-                                child: Text('Set role: owner'),
-                              ),
-                              PopupMenuItem(
-                                value: 'admin',
-                                child: Text('Set role: admin'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(user['email'] as String? ?? ''),
+                              const SizedBox(height: 4),
+                              Text(
+                                l10n.adminOwnerRequestSubtitle,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(fontStyle: FontStyle.italic),
                               ),
                             ],
-                            child: Chip(
-                              label: Text('Role: ${user['role'] ?? 'user'}'),
-                            ),
+                          ),
+                          trailing: Wrap(
+                            spacing: 8,
+                            children: [
+                              FilledButton(
+                                onPressed: () async {
+                                  await ref
+                                      .read(adminRepositoryProvider)
+                                      .approveOwnerRequest(
+                                        userId: user['id'] as String,
+                                      );
+                                },
+                                child: Text(l10n.adminApproveAction),
+                              ),
+                              OutlinedButton(
+                                onPressed: () async {
+                                  await ref
+                                      .read(adminRepositoryProvider)
+                                      .rejectOwnerRequest(
+                                        userId: user['id'] as String,
+                                      );
+                                },
+                                child: Text(l10n.adminRejectAction),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    )
-                    .toList(),
+                    ),
+                    const SizedBox(height: 24),
+                  ]
+                  else
+                    Text(l10n.adminOwnerRequestsEmpty),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.adminAllUsersTitle,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 12),
+                  ...users.map(
+                    (user) {
+                      final status = user['roleStatus'] as String? ?? 'active';
+                      return Card(
+                        child: ListTile(
+                          title: Text(user['name'] as String? ?? '—'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(user['email'] as String? ?? ''),
+                              const SizedBox(height: 4),
+                              Text('${l10n.adminRoleLabel}: ${user['role'] ?? 'user'}'),
+                              Text('${l10n.adminStatusLabel}: $status'),
+                            ],
+                          ),
+                          trailing: Wrap(
+                            spacing: 8,
+                            children: [
+                              PopupMenuButton<String>(
+                                onSelected: (role) async {
+                                  await ref
+                                      .read(adminRepositoryProvider)
+                                      .updateUserRole(
+                                        userId: user['id'] as String,
+                                        role: role,
+                                      );
+                                },
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    value: 'user',
+                                    child: Text(l10n.adminSetRoleUser),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'owner',
+                                    child: Text(l10n.adminSetRoleOwner),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'admin',
+                                    child: Text(l10n.adminSetRoleAdmin),
+                                  ),
+                                ],
+                                child: const Icon(Icons.manage_accounts),
+                              ),
+                              IconButton(
+                                tooltip: l10n.adminDeleteUser,
+                                icon: const Icon(Icons.delete_outline),
+                                onPressed: () async {
+                                  await ref
+                                      .read(adminRepositoryProvider)
+                                      .deleteUser(
+                                        userId: user['id'] as String,
+                                      );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               );
             },
           ),

@@ -30,6 +30,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tabProfile => 'الملف الشخصي';
 
   @override
+  String get adminConsoleTitle => 'لوحة التحكم';
+
+  @override
   String get exploreHeadline => 'اكتشف أبرز الأعمال القريبة منك';
 
   @override
@@ -150,10 +153,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authSignOut => 'تسجيل الخروج';
 
   @override
-  String get authBecomeOwner => 'أنا صاحب نشاط تجاري';
+  String get authOwnerRequestButton => 'طلب صلاحيات المالك';
 
   @override
-  String get authBecomeOwnerSubtitle => 'يستطيع المالك إدارة نشاطه التجاري داخل وين';
+  String get authOwnerRequestSubtitle => 'بعد موافقة المشرف يمكنك إدارة نشاطك التجاري.';
+
+  @override
+  String get authOwnerRequestSubmitted => 'تم استلام طلبك وسيتم إخطارك بعد موافقة المشرف.';
+
+  @override
+  String get authOwnerRequestPending => 'تم استلام طلبك. يجب انتظار موافقة المشرف قبل نشر نشاطك.';
+
+  @override
+  String get authOwnerRequestRejected => 'تم رفض طلبك السابق. حدّث بياناتك وقدّم الطلب مرة أخرى عند الجاهزية.';
 
   @override
   String get authManageBusiness => 'إدارة نشاطي التجاري';
@@ -285,6 +297,54 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminConsoleButton => 'فتح لوحة التحكم';
 
   @override
+  String get adminPendingBusinessesTitle => 'أنشطة بانتظار الاعتماد';
+
+  @override
+  String get adminPendingBusinessesEmpty => 'لا توجد أنشطة بانتظار الاعتماد حاليًا.';
+
+  @override
+  String get adminApproveAction => 'اعتماد';
+
+  @override
+  String get adminRejectAction => 'رفض';
+
+  @override
+  String get adminUsersTitle => 'المستخدمون';
+
+  @override
+  String get adminUsersEmpty => 'لا يوجد مستخدمون حتى الآن.';
+
+  @override
+  String get adminOwnerRequestsTitle => 'طلبات صلاحيات المالك';
+
+  @override
+  String get adminOwnerRequestsEmpty => 'لا توجد طلبات صلاحيات ملاك حاليًا.';
+
+  @override
+  String get adminOwnerRequestSubtitle => 'طلب صلاحيات المالك';
+
+  @override
+  String get adminAllUsersTitle => 'جميع المستخدمين';
+
+  @override
+  String get adminRoleLabel => 'الدور';
+
+  @override
+  String get adminStatusLabel => 'الحالة';
+
+  @override
+  String get adminSetRoleUser => 'تعيين الدور: مستخدم';
+
+  @override
+  String get adminSetRoleOwner => 'تعيين الدور: مالك';
+
+  @override
+  String get adminSetRoleAdmin => 'تعيين الدور: مشرف';
+
+  @override
+  String get adminDeleteUser => 'حذف المستخدم';
+
+  @override
   String get paymentsUpgradeTitle => 'ترقية الباقة';
 
   @override
@@ -294,7 +354,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentsStandardPlan => 'باقة ستاندرد';
 
   @override
-  String get paymentsStandardPrice => '199 درهم / شهر';
+  String get paymentsStandardPrice => '199 ₪ / شهر';
 
   @override
   String get paymentsStandardBenefit1 => 'حتى 5 أعضاء فريق';
@@ -309,7 +369,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentsPremiumPlan => 'باقة بريميوم';
 
   @override
-  String get paymentsPremiumPrice => '399 درهم / شهر';
+  String get paymentsPremiumPrice => '399 ₪ / شهر';
 
   @override
   String get paymentsPremiumBenefit1 => 'عدد غير محدود من حسابات الموظفين';
@@ -380,7 +440,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get businessPhoneLabel => 'رقم الهاتف';
 
   @override
-  String get businessPhoneHint => 'أدخل رمز الدولة مثال: ‎+971…';
+  String get businessPhoneHint => 'أدخل رمز الدولة مثال: ‎+972…';
 
   @override
   String get businessWhatsappLabel => 'واتساب';
