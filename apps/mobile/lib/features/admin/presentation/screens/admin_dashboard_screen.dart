@@ -201,11 +201,42 @@ class AdminDashboardScreen extends ConsumerWidget {
                                 tooltip: l10n.adminDeleteUser,
                                 icon: const Icon(Icons.delete_outline),
                                 onPressed: () async {
-                                  await ref
-                                      .read(adminRepositoryProvider)
-                                      .deleteUser(
-                                        userId: user['id'] as String,
-                                      );
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text(l10n.adminDeleteUser),
+                                      content: Text(l10n.adminDeleteUserConfirm),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(false),
+                                          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                                        ),
+                                        FilledButton(
+                                          onPressed: () => Navigator.of(context).pop(true),
+                                          child: Text(MaterialLocalizations.of(context).okButtonLabel),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirm != true || !context.mounted) return;
+                                  try {
+                                    await ref
+                                        .read(adminRepositoryProvider)
+                                        .deleteUser(userId: user['id'] as String);
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(l10n.adminDeleteUserSuccess)),
+                                    );
+                                  } catch (error) {
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          '${l10n.adminDeleteUserError}\n${error.toString()}',
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             ],

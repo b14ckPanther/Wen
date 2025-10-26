@@ -384,6 +384,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminDeleteUser => 'حذف المستخدم';
 
   @override
+  String get adminDeleteUserConfirm => 'سيتم حذف المستخدم وإلغاء قدرته على تسجيل الدخول. هل تريد المتابعة؟';
+
+  @override
+  String get adminDeleteUserSuccess => 'تم حذف المستخدم بنجاح.';
+
+  @override
+  String get adminDeleteUserError => 'تعذّر حذف المستخدم.';
+
+  @override
   String get paymentsUpgradeTitle => 'ترقية الباقة';
 
   @override

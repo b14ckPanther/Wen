@@ -845,6 +845,24 @@ abstract class AppLocalizations {
   /// **'Delete user'**
   String get adminDeleteUser;
 
+  /// No description provided for @adminDeleteUserConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove the user from Wen and revoke their sign-in access. Continue?'**
+  String get adminDeleteUserConfirm;
+
+  /// No description provided for @adminDeleteUserSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'User removed successfully.'**
+  String get adminDeleteUserSuccess;
+
+  /// No description provided for @adminDeleteUserError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete user.'**
+  String get adminDeleteUserError;
+
   /// No description provided for @paymentsUpgradeTitle.
   ///
   /// In en, this message translates to:

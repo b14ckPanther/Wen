@@ -3,6 +3,7 @@ import * as functions from "firebase-functions";
 import { enqueueDocument } from "./ai/embeddingQueue";
 import { syncEmbeddingsBatch } from "./ai/syncEmbeddings";
 import { approveBusinessCallable } from "./admin/approveBusiness";
+import { deleteUserCallable } from "./admin/deleteUser";
 
 admin.initializeApp();
 
@@ -18,6 +19,7 @@ export const scheduledSyncEmbeddings = functions.pubsub
   });
 
 export const approveBusiness = approveBusinessCallable;
+export const deleteUser = deleteUserCallable;
 
 // ✅ Next.js SSR Hosting
 import * as path from "path";

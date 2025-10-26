@@ -79,6 +79,7 @@ export default function DashboardPage() {
   const [fetching, setFetching] = useState(true);
   const [activeBusinessAction, setActiveBusinessAction] = useState<string | null>(null);
   const [activeRoleAction, setActiveRoleAction] = useState<string | null>(null);
+  const [activeDeleteAction, setActiveDeleteAction] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<'success' | 'error'>('success');
 
@@ -189,6 +190,29 @@ export default function DashboardPage() {
       setFeedbackTone('error');
     } finally {
       setActiveRoleAction(null);
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    const confirmed = window.confirm(
+      'Delete this user? They will lose access to the Wen admin experience.',
+    );
+    if (!confirmed) {
+      return;
+    }
+    try {
+      setActiveDeleteAction(userId);
+      const callable = httpsCallable(functions, 'deleteUser');
+      await callable({ userId });
+      setUsers((prev) => prev.filter((item) => item.id !== userId));
+      setFeedback('User removed successfully.');
+      setFeedbackTone('success');
+    } catch (error: any) {
+      console.error('Failed to delete user', error);
+      setFeedback(error?.message ?? 'Unable to delete user.');
+      setFeedbackTone('error');
+    } finally {
+      setActiveDeleteAction(null);
     }
   };
 
@@ -329,13 +353,14 @@ export default function DashboardPage() {
                   <th className="px-4 py-3 font-medium">Name</th>
                   <th className="px-4 py-3 font-medium">Email</th>
                   <th className="px-4 py-3 font-medium">Role</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 bg-slate-900/10 text-slate-100">
                 {fetching && users.length === 0 ? (
-                  <EmptyState col={3} message="Fetching team members…" />
+                  <EmptyState col={4} message="Fetching team members…" />
                 ) : users.length === 0 ? (
-                  <EmptyState col={3} message="No users yet." />
+                  <EmptyState col={4} message="No users yet." />
                 ) : (
                   users.map((row) => (
                     <tr key={row.id} className="transition hover:bg-white/5">
@@ -353,9 +378,18 @@ export default function DashboardPage() {
                         <option value="admin">admin</option>
                       </select>
                     </td>
-                  </tr>
-                ))
-              )}
+                    <td className="px-4 py-4 text-right">
+                      <button
+                        onClick={() => deleteUser(row.id)}
+                        disabled={activeDeleteAction === row.id}
+                        className="inline-flex items-center gap-2 rounded-full border border-rose-400/40 px-3 py-1 text-xs text-rose-200 transition hover:border-rose-300 hover:text-rose-100 disabled:cursor-not-allowed disabled:border-slate-600/40 disabled:text-slate-400"
+                      >
+                        {activeDeleteAction === row.id ? 'Removing…' : 'Delete'}
+                      </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

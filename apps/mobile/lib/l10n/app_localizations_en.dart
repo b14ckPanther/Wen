@@ -384,6 +384,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminDeleteUser => 'Delete user';
 
   @override
+  String get adminDeleteUserConfirm => 'This will remove the user from Wen and revoke their sign-in access. Continue?';
+
+  @override
+  String get adminDeleteUserSuccess => 'User removed successfully.';
+
+  @override
+  String get adminDeleteUserError => 'Failed to delete user.';
+
+  @override
   String get paymentsUpgradeTitle => 'Upgrade plan';
 
   @override

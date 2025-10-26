@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class AdminRepository {
-  AdminRepository(this._firestore);
+  AdminRepository(this._firestore, this._functions);
 
   final FirebaseFirestore _firestore;
+  final FirebaseFunctions _functions;
 
   CollectionReference<Map<String, dynamic>> get _usersCollection =>
       _firestore.collection('users');
@@ -50,6 +52,7 @@ class AdminRepository {
   }
 
   Future<void> deleteUser({required String userId}) async {
-    await _usersCollection.doc(userId).delete();
+    final callable = _functions.httpsCallable('deleteUser');
+    await callable.call({'userId': userId});
   }
 }

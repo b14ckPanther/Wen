@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/application/auth_providers.dart';
@@ -7,7 +8,10 @@ import '../../businesses/data/models/business.dart';
 import '../data/admin_repository.dart';
 
 final adminRepositoryProvider = Provider<AdminRepository>((ref) {
-  return AdminRepository(FirebaseFirestore.instance);
+  return AdminRepository(
+    FirebaseFirestore.instance,
+    FirebaseFunctions.instance,
+  );
 });
 
 final adminUsersProvider = StreamProvider.autoDispose(
