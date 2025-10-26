@@ -245,11 +245,17 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get exploreSearchAction;
 
-  /// No description provided for @exploreFeaturedCategories.
+  /// No description provided for @exploreSpotlightTitle.
   ///
   /// In en, this message translates to:
-  /// **'Popular categories this week'**
-  String get exploreFeaturedCategories;
+  /// **'Featured businesses'**
+  String get exploreSpotlightTitle;
+
+  /// No description provided for @exploreSpotlightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored and recommended listings near you.'**
+  String get exploreSpotlightSubtitle;
 
   /// No description provided for @searchPlaceholder.
   ///
@@ -382,6 +388,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign out'**
   String get authSignOut;
+
+  /// No description provided for @authWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Wen'**
+  String get authWelcomeTitle;
+
+  /// No description provided for @authWelcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover, curate, and grow with the business community.'**
+  String get authWelcomeSubtitle;
 
   /// No description provided for @authOwnerRequestButton.
   ///
@@ -946,6 +964,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse categories'**
   String get categoriesTitle;
+
+  /// No description provided for @categoriesHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover services by category'**
+  String get categoriesHeroTitle;
+
+  /// No description provided for @categoriesHeroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a category to explore tailored service types.'**
+  String get categoriesHeroSubtitle;
+
+  /// No description provided for @categoriesSubcategoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a service type'**
+  String get categoriesSubcategoriesTitle;
+
+  /// No description provided for @categoriesSubcategoriesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No service types available yet.'**
+  String get categoriesSubcategoriesEmpty;
 
   /// No description provided for @categoriesEmpty.
   ///

@@ -339,49 +339,94 @@ class _AuthFormsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final mediaHeight = MediaQuery.of(context).size.height;
+    final formHeight = mediaHeight.isFinite
+        ? mediaHeight.clamp(380.0, 620.0) * 0.55
+        : 420.0;
+
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 480),
-        child: Card(
-          margin: const EdgeInsets.all(24),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: DefaultTabController(
-              length: 2,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final screenHeight = MediaQuery.of(context).size.height;
-                  final availableHeight = constraints.maxHeight.isFinite
-                      ? constraints.maxHeight
-                      : screenHeight * 0.75;
-                  // Tab bar height (~48) + spacing (24) should be considered when clamping.
-                  const tabBarHeight = 48.0;
-                  const gapHeight = 24.0;
-                  final formHeight = (availableHeight - tabBarHeight - gapHeight).clamp(280.0, 520.0);
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TabBar(
-                        tabs: [
-                          Tab(text: l10n.authSignInTab),
-                          Tab(text: l10n.authSignUpTab),
-                        ],
-                      ),
-                      const SizedBox(height: gapHeight),
-                      SizedBox(
-                        height: formHeight,
-                        child: TabBarView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          children: const [
-                            SingleChildScrollView(child: SignInForm()),
-                            SingleChildScrollView(child: SignUpForm()),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
+        constraints: const BoxConstraints(maxWidth: 540),
+        child: DefaultTabController(
+          length: 2,
+          child: Container(
+            margin: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 36),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(32),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  theme.colorScheme.primary.withValues(alpha: 0.25),
+                  theme.colorScheme.surface.withValues(alpha: 0.75),
+                ],
               ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                  blurRadius: 32,
+                  offset: const Offset(0, 24),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.authWelcomeTitle,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  l10n.authWelcomeSubtitle,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: TabBar(
+                    indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                    ),
+                    labelColor: theme.colorScheme.primary,
+                    unselectedLabelColor: Colors.white70,
+                    tabs: [
+                      Tab(text: l10n.authSignInTab),
+                      Tab(text: l10n.authSignUpTab),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 28),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  child: SizedBox(
+                    height: formHeight,
+                    child: const TabBarView(
+                      physics: NeverScrollableScrollPhysics(),
+                      children: [
+                        SingleChildScrollView(child: SignInForm()),
+                        SingleChildScrollView(child: SignUpForm()),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

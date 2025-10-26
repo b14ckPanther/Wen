@@ -4,18 +4,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../businesses/application/business_repository_provider.dart';
-import '../../../businesses/data/models/business_category.dart';
 
-class CategoriesScreen extends ConsumerWidget {
-  const CategoriesScreen({super.key});
+class CategorySubcategoriesScreen extends ConsumerWidget {
+  const CategorySubcategoriesScreen({
+    super.key,
+    required this.categoryId,
+    this.initialCategoryName,
+  });
 
-  void _openCategory(BuildContext context, BusinessCategory category) {
-    context.pushNamed(
-      'category-subcategories',
-      pathParameters: {'id': category.id},
-      extra: category,
-    );
-  }
+  final String categoryId;
+  final String? initialCategoryName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,14 +25,18 @@ class CategoriesScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(l10n.categoriesTitle),
+        title: Text(initialCategoryName ?? l10n.categoriesTitle),
       ),
       body: categoriesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (categories) {
-          final topCategories = categories
-              .where((category) => category.parentId == null || (category.parentId?.isEmpty ?? true))
+          final parent = categories.firstWhere(
+            (item) => item.id == categoryId,
+            orElse: () => throw Exception('Category not found'),
+          );
+          final subCategories = categories
+              .where((item) => item.parentId == categoryId)
               .toList()
             ..sort((a, b) => a.name.compareTo(b.name));
 
@@ -51,12 +53,12 @@ class CategoriesScreen extends ConsumerWidget {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 32, 24, 8),
+                      padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            l10n.categoriesHeroTitle,
+                            parent.name,
                             style: Theme.of(context)
                                 .textTheme
                                 .displaySmall
@@ -64,7 +66,7 @@ class CategoriesScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            l10n.categoriesHeroSubtitle,
+                            l10n.categoriesSubcategoriesTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge
@@ -74,12 +76,12 @@ class CategoriesScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  if (topCategories.isEmpty)
+                  if (subCategories.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
                         child: Text(
-                          l10n.categoriesEmpty,
+                          l10n.categoriesSubcategoriesEmpty,
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium
@@ -89,23 +91,29 @@ class CategoriesScreen extends ConsumerWidget {
                     )
                   else
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       sliver: SliverGrid(
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          mainAxisSpacing: 24,
-                          crossAxisSpacing: 24,
-                          childAspectRatio: 0.95,
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                          childAspectRatio: 1.15,
                         ),
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            final category = topCategories[index];
-                            return _CategoryTile(
-                              category: category,
-                              onTap: () => _openCategory(context, category),
+                            final sub = subCategories[index];
+                            return _SubcategoryCard(
+                              title: sub.name,
+                              onTap: () {
+                                context.pushNamed(
+                                  'category-detail',
+                                  pathParameters: {'id': sub.id},
+                                  extra: sub,
+                                );
+                              },
                             );
                           },
-                          childCount: topCategories.length,
+                          childCount: subCategories.length,
                         ),
                       ),
                     ),
@@ -119,68 +127,48 @@ class CategoriesScreen extends ConsumerWidget {
   }
 }
 
-class _CategoryTile extends StatelessWidget {
-  const _CategoryTile({required this.category, required this.onTap});
+class _SubcategoryCard extends StatelessWidget {
+  const _SubcategoryCard({required this.title, required this.onTap});
 
-  final BusinessCategory category;
+  final String title;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final palette = _paletteSwatches[category.id.hashCode.abs() % _paletteSwatches.length];
-    final icon = _icons[category.id.hashCode.abs() % _icons.length];
-
+    final colors = _gradientSwatches[title.hashCode.abs() % _gradientSwatches.length];
     return InkWell(
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: BorderRadius.circular(24),
       onTap: onTap,
       child: Ink(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
-            colors: palette,
+            colors: colors,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: palette.last.withValues(alpha: 0.35),
+              color: colors.last.withValues(alpha: 0.35),
               blurRadius: 18,
-              offset: const Offset(0, 12),
+              offset: const Offset(0, 10),
             ),
           ],
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 48,
-                width: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(icon, color: Colors.white),
-              ),
+              const Icon(Icons.auto_awesome, color: Colors.white70),
               const Spacer(),
               Text(
-                category.name,
-                style: theme.textTheme.titleLarge?.copyWith(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _subtitleForCategory(category.name),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white70,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -190,29 +178,10 @@ class _CategoryTile extends StatelessWidget {
   }
 }
 
-String _subtitleForCategory(String name) {
-  final adjectives = ['Curated picks', 'Trusted experts', 'Top-rated pros', 'Local highlights'];
-  final nouns = ['for every need', 'handpicked for you', 'ready to help', 'at your service'];
-  final seed = name.hashCode.abs();
-  return '${adjectives[seed % adjectives.length]} ${nouns[(seed ~/ 7) % nouns.length]}';
-}
-
-const _paletteSwatches = [
-  [Color(0xFF7C3AED), Color(0xFF4C1D95)],
-  [Color(0xFF0EA5E9), Color(0xFF0369A1)],
-  [Color(0xFF22C55E), Color(0xFF15803D)],
-  [Color(0xFFF97316), Color(0xFFEA580C)],
-  [Color(0xFFE11D48), Color(0xFF9F1239)],
-  [Color(0xFF14B8A6), Color(0xFF0F766E)],
-];
-
-const _icons = [
-  Icons.storefront,
-  Icons.design_services,
-  Icons.restaurant,
-  Icons.spa,
-  Icons.school,
-  Icons.event_available,
-  Icons.clean_hands,
-  Icons.local_shipping,
+const _gradientSwatches = [
+  [Color(0xFF7F5FFF), Color(0xFF5A3EEC)],
+  [Color(0xFF34D399), Color(0xFF059669)],
+  [Color(0xFF60A5FA), Color(0xFF2563EB)],
+  [Color(0xFFF872D7), Color(0xFFEC4899)],
+  [Color(0xFFFB923C), Color(0xFFF97316)],
 ];

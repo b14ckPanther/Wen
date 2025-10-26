@@ -7,6 +7,7 @@ class AppRoutePath {
   static const admin = '/profile/admin';
   static const businessDetails = '/business/:id';
   static const categoryDetails = '/categories/:id';
+  static const categorySubcategories = '/categories/:id/subcategories';
   static const ownerRegister = '/auth/owner-register';
   static const ownerLocationPicker = '/auth/owner-location-picker';
 }

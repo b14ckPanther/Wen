@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/explore/presentation/screens/explore_screen.dart';
 import '../features/categories/presentation/screens/categories_screen.dart';
 import '../features/categories/presentation/screens/category_detail_screen.dart';
+import '../features/categories/presentation/screens/category_subcategories_screen.dart';
 import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/navigation/presentation/wen_shell.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
@@ -135,6 +136,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final extra = state.extra;
           final category = extra is BusinessCategory ? extra : null;
           return CategoryDetailScreen(
+            categoryId: id,
+            initialCategoryName: category?.name,
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutePath.categorySubcategories,
+        name: 'category-subcategories',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          final extra = state.extra;
+          final category = extra is BusinessCategory ? extra : null;
+          return CategorySubcategoriesScreen(
             categoryId: id,
             initialCategoryName: category?.name,
           );

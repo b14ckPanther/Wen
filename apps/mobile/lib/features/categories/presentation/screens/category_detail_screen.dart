@@ -50,80 +50,101 @@ class _CategoryDetailScreenState
     final businessesAsync = ref.watch(categoryBusinessesProvider(request));
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(category?.name ?? widget.initialCategoryName ?? l10n.categoriesTitle),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.categoriesRadiusLabel(_radiusKm.toStringAsFixed(0)),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Slider(
-                  value: _radiusKm,
-                  min: 5,
-                  max: 80,
-                  divisions: 15,
-                  label: '${_radiusKm.toStringAsFixed(0)} km',
-                  onChanged: (value) {
-                    setState(() {
-                      _radiusKm = value;
-                    });
-                  },
-                ),
-              ],
-            ),
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0F172A), Color(0xFF020617)],
           ),
-          Expanded(
-            child: businessesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => Center(
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 8),
+              child: Card(
+                color: Colors.white.withValues(alpha: 0.08),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    'Failed to load businesses: $error',
-                    textAlign: TextAlign.center,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.categoriesRadiusLabel(_radiusKm.toStringAsFixed(0)),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Slider(
+                        value: _radiusKm,
+                        min: 5,
+                        max: 80,
+                        divisions: 15,
+                        label: '${_radiusKm.toStringAsFixed(0)} km',
+                        onChanged: (value) {
+                          setState(() {
+                            _radiusKm = value;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
-              data: (businesses) {
-                if (businesses.isEmpty) {
-                  return Center(
-                    child: Text(
-                      l10n.categoriesNoBusinesses,
-                      style: theme.textTheme.titleMedium,
-                    ),
-                  );
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                  itemBuilder: (context, index) {
-                    final business = businesses[index];
-                    final distanceKm = business.distanceInKm(
-                      latitude: center.latitude,
-                      longitude: center.longitude,
-                    );
-                    return BusinessListTile(
-                      business: business,
-                      distanceKm: distanceKm,
-                      onTap: () => _openBusiness(business),
-                      onViewOnMap: null,
-                    );
-                  },
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemCount: businesses.length,
-                );
-              },
             ),
-          ),
-        ],
+            Expanded(
+              child: businessesAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, _) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      'Failed to load businesses: $error',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                    ),
+                  ),
+                ),
+                data: (businesses) {
+                  if (businesses.isEmpty) {
+                    return Center(
+                      child: Text(
+                        l10n.categoriesNoBusinesses,
+                        style: theme.textTheme.titleMedium?.copyWith(color: Colors.white70),
+                      ),
+                    );
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    itemBuilder: (context, index) {
+                      final business = businesses[index];
+                      final distanceKm = business.distanceInKm(
+                        latitude: center.latitude,
+                        longitude: center.longitude,
+                      );
+                      return BusinessListTile(
+                        business: business,
+                        distanceKm: distanceKm,
+                        onTap: () => _openBusiness(business),
+                        onViewOnMap: null,
+                      );
+                    },
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemCount: businesses.length,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

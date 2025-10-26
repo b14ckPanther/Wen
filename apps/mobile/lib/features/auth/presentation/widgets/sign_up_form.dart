@@ -46,6 +46,23 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     final signUpState = ref.watch(signUpControllerProvider);
     final isLoading = signUpState.isLoading;
     final error = signUpState.asError?.error;
+    final theme = Theme.of(context);
+    InputDecoration fieldDecoration(String label, IconData icon) {
+      return InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        filled: true,
+        fillColor: theme.colorScheme.surface.withValues(alpha: 0.35),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.15)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.6),
+        ),
+      );
+    }
 
     return Form(
       key: _formKey,
@@ -54,7 +71,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
         children: [
           TextFormField(
             controller: _nameController,
-            decoration: InputDecoration(labelText: l10n.authFullNameLabel),
+            decoration: fieldDecoration(l10n.authFullNameLabel, Icons.person_outline),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return l10n.authNameRequired;
@@ -65,7 +82,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           const SizedBox(height: 12),
           TextFormField(
             controller: _emailController,
-            decoration: InputDecoration(labelText: l10n.authEmailLabel),
+            decoration: fieldDecoration(l10n.authEmailLabel, Icons.alternate_email),
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -80,7 +97,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           const SizedBox(height: 12),
           TextFormField(
             controller: _passwordController,
-            decoration: InputDecoration(labelText: l10n.authPasswordLabel),
+            decoration: fieldDecoration(l10n.authPasswordLabel, Icons.lock_outline),
             obscureText: true,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -95,9 +112,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           const SizedBox(height: 12),
           TextFormField(
             controller: _confirmPasswordController,
-            decoration: InputDecoration(
-              labelText: l10n.authConfirmPasswordLabel,
-            ),
+            decoration: fieldDecoration(l10n.authConfirmPasswordLabel, Icons.verified_user_outlined),
             obscureText: true,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -109,15 +124,19 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               return null;
             },
           ),
-          ElevatedButton(
-            onPressed: isLoading ? null : _submit,
-            child: isLoading
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.authCreateAccountButton),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 52,
+            child: FilledButton(
+              onPressed: isLoading ? null : _submit,
+              child: isLoading
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(l10n.authCreateAccountButton),
+            ),
           ),
           TextButton(
             onPressed: () {

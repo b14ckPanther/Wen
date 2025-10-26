@@ -70,11 +70,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     );
   }
 
-  void _openCategory(String categoryId) {
+  void _openCategory(BusinessCategory category) {
     if (!mounted) return;
     context.pushNamed(
-      'category-detail',
-      pathParameters: {'id': categoryId},
+      'category-subcategories',
+      pathParameters: {'id': category.id},
+      extra: category,
     );
   }
 
@@ -382,9 +383,16 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                l10n.exploreFeaturedCategories,
+                                l10n.exploreSpotlightTitle,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                l10n.exploreSpotlightSubtitle,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -399,8 +407,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                     final category = topLevel[index];
                                     return _CategoryPreviewCard(
                                       category: category,
-                                      onTap: () =>
-                                          _openCategory(category.id),
+                                      onTap: () => _openCategory(category),
                                     );
                                   },
                                 ),
@@ -509,7 +516,7 @@ class _CategoryPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colors = _explorePalette[category.id.hashCode.abs() % _explorePalette.length];
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
@@ -518,13 +525,18 @@ class _CategoryPreviewCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           gradient: LinearGradient(
-            colors: [
-              theme.colorScheme.primary.withValues(alpha: 0.85),
-              theme.colorScheme.primaryContainer,
-            ],
+            colors: colors,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.last.withValues(alpha: 0.35),
+              blurRadius: 16,
+              offset: const Offset(0, 10),
+            ),
+          ],
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -532,13 +544,13 @@ class _CategoryPreviewCard extends StatelessWidget {
           children: [
             Icon(
               Icons.category_outlined,
-              color: theme.colorScheme.onPrimaryContainer,
+              color: Colors.white70,
             ),
             const Spacer(),
             Text(
               category.name,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onPrimaryContainer,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.white,
                 fontWeight: FontWeight.w700,
               ),
               maxLines: 2,
@@ -550,3 +562,11 @@ class _CategoryPreviewCard extends StatelessWidget {
     );
   }
 }
+
+const _explorePalette = [
+  [Color(0xFF7C3AED), Color(0xFF4C1D95)],
+  [Color(0xFF0EA5E9), Color(0xFF0369A1)],
+  [Color(0xFF22C55E), Color(0xFF15803D)],
+  [Color(0xFFF97316), Color(0xFFEA580C)],
+  [Color(0xFFE11D48), Color(0xFF9F1239)],
+];

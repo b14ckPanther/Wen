@@ -84,7 +84,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreSearchAction => 'Search';
 
   @override
-  String get exploreFeaturedCategories => 'Popular categories this week';
+  String get exploreSpotlightTitle => 'Featured businesses';
+
+  @override
+  String get exploreSpotlightSubtitle => 'Sponsored and recommended listings near you.';
 
   @override
   String get searchPlaceholder => 'Search for businesses or categories';
@@ -151,6 +154,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authSignOut => 'Sign out';
+
+  @override
+  String get authWelcomeTitle => 'Welcome to Wen';
+
+  @override
+  String get authWelcomeSubtitle => 'Discover, curate, and grow with the business community.';
 
   @override
   String get authOwnerRequestButton => 'Request owner access';
@@ -433,6 +442,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoriesTitle => 'Browse categories';
+
+  @override
+  String get categoriesHeroTitle => 'Discover services by category';
+
+  @override
+  String get categoriesHeroSubtitle => 'Choose a category to explore tailored service types.';
+
+  @override
+  String get categoriesSubcategoriesTitle => 'Select a service type';
+
+  @override
+  String get categoriesSubcategoriesEmpty => 'No service types available yet.';
 
   @override
   String get categoriesEmpty => 'No categories available yet.';

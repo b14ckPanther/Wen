@@ -84,7 +84,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exploreSearchAction => 'بحث';
 
   @override
-  String get exploreFeaturedCategories => 'أبرز الفئات هذا الأسبوع';
+  String get exploreSpotlightTitle => 'أنشطة مميزة';
+
+  @override
+  String get exploreSpotlightSubtitle => 'قائمة بالأنشطة الممولة والمقترحة بالقرب منك.';
 
   @override
   String get searchPlaceholder => 'ابحث عن نشاط تجاري أو فئة';
@@ -151,6 +154,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authSignOut => 'تسجيل الخروج';
+
+  @override
+  String get authWelcomeTitle => 'مرحبًا بك في وين';
+
+  @override
+  String get authWelcomeSubtitle => 'اكتشف ونسّق وتواصل مع شبكة الأعمال من مكان واحد.';
 
   @override
   String get authOwnerRequestButton => 'طلب صلاحيات المالك';
@@ -433,6 +442,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get categoriesTitle => 'تصفح الفئات';
+
+  @override
+  String get categoriesHeroTitle => 'استكشف الخدمات حسب الفئة';
+
+  @override
+  String get categoriesHeroSubtitle => 'اختر فئة للعثور على نوع الخدمة الذي تبحث عنه.';
+
+  @override
+  String get categoriesSubcategoriesTitle => 'اختر نوع الخدمة';
+
+  @override
+  String get categoriesSubcategoriesEmpty => 'لا توجد أنواع خدمات متاحة بعد.';
 
   @override
   String get categoriesEmpty => 'لا توجد فئات متاحة بعد.';
