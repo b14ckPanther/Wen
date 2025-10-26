@@ -18,6 +18,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tabExplore => 'اكتشف';
 
   @override
+  String get tabCategories => 'الفئات';
+
+  @override
   String get tabSearch => 'بحث';
 
   @override
@@ -30,15 +33,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exploreHeadline => 'اكتشف أبرز الأعمال القريبة منك';
 
   @override
-  String get exploreLocationPermissionRequired =>
-      'قم بتفعيل إذن الموقع للعثور على الأعمال القريبة.';
+  String get exploreLocationPermissionRequired => 'قم بتفعيل إذن الموقع للعثور على الأعمال القريبة.';
 
   @override
   String get exploreLocationPermissionCta => 'تفعيل';
 
   @override
-  String get exploreLocationPermissionDeniedForever =>
-      'تم حظر إذن الموقع. حدّث الإعدادات للمتابعة.';
+  String get exploreLocationPermissionDeniedForever => 'تم حظر إذن الموقع. حدّث الإعدادات للمتابعة.';
 
   @override
   String get exploreLocationOpenSettings => 'الإعدادات';
@@ -53,21 +54,49 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exploreLocationRetry => 'إعادة المحاولة';
 
   @override
+  String get exploreUseMyLocationTitle => 'استخدم موقعك الحالي';
+
+  @override
+  String get exploreManualRegionTitle => 'استكشف حسب المنطقة';
+
+  @override
+  String get exploreUseMyLocationToggle => 'تفعيل الموقع عبر GPS';
+
+  @override
+  String get exploreUseMyLocationSubtitle => 'حدّث النتائج لإظهار الأنشطة القريبة تلقائيًا.';
+
+  @override
+  String get exploreManualRegionToggleSubtitle => 'اختر منطقة جاهزة للاستكشاف أينما كنت.';
+
+  @override
+  String get exploreManualRegionLabel => 'اختر المنطقة';
+
+  @override
+  String get exploreRefreshLocation => 'تحديث الموقع';
+
+  @override
+  String get exploreSearchShortcut => 'ابحث عن نشاط أو خدمة…';
+
+  @override
+  String get exploreSearchAction => 'بحث';
+
+  @override
+  String get exploreFeaturedCategories => 'أبرز الفئات هذا الأسبوع';
+
+  @override
   String get searchPlaceholder => 'ابحث عن نشاط تجاري أو فئة';
 
   @override
   String get favoritesEmptyTitle => 'لا توجد عناصر مفضلة بعد';
 
   @override
-  String get favoritesEmptySubtitle =>
-      'احفظ الأعمال لمقارنتها لاحقًا والوصول إليها بسرعة.';
+  String get favoritesEmptySubtitle => 'احفظ الأعمال لمقارنتها لاحقًا والوصول إليها بسرعة.';
 
   @override
   String get profileGuestTitle => 'مرحبًا بك في وين';
 
   @override
-  String get profileGuestSubtitle =>
-      'سجّل الدخول لإدارة أنشطة أعمالك وإعداداتك.';
+  String get profileGuestSubtitle => 'سجّل الدخول لإدارة أنشطة أعمالك وإعداداتك.';
 
   @override
   String get businessStatusOpen => 'مفتوح الآن';
@@ -85,6 +114,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchAll => 'الكل';
 
   @override
+  String get regionNorth => 'الشمال';
+
+  @override
+  String get regionSouth => 'الجنوب';
+
+  @override
+  String get regionEast => 'الشرق';
+
+  @override
+  String get regionWest => 'الغرب';
+
+  @override
+  String get regionCenter => 'الوسط';
+
+  @override
   String get profileSignInCta => 'تسجيل الدخول';
 
   @override
@@ -100,8 +144,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authResetTitle => 'إعادة تعيين كلمة المرور';
 
   @override
-  String get authResetSent =>
-      'تم إرسال رسالة لإعادة تعيين كلمة المرور. تفقد بريدك الإلكتروني.';
+  String get authResetSent => 'تم إرسال رسالة لإعادة تعيين كلمة المرور. تفقد بريدك الإلكتروني.';
 
   @override
   String get authSignOut => 'تسجيل الخروج';
@@ -110,8 +153,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authBecomeOwner => 'أنا صاحب نشاط تجاري';
 
   @override
-  String get authBecomeOwnerSubtitle =>
-      'يستطيع المالك إدارة نشاطه التجاري داخل وين';
+  String get authBecomeOwnerSubtitle => 'يستطيع المالك إدارة نشاطه التجاري داخل وين';
 
   @override
   String get authManageBusiness => 'إدارة نشاطي التجاري';
@@ -141,8 +183,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authOwnerSwitchTitle => 'أنا صاحب نشاط تجاري';
 
   @override
-  String get authOwnerSwitchSubtitle =>
-      'يستطيع المالك إدارة نشاطه التجاري داخل وين';
+  String get authOwnerSwitchSubtitle => 'يستطيع المالك إدارة نشاطه التجاري داخل وين';
 
   @override
   String get authEmailRequired => 'يرجى إدخال البريد الإلكتروني';
@@ -199,8 +240,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get businessUpdateButton => 'تحديث النشاط';
 
   @override
-  String get businessSaveSuccess =>
-      'تم حفظ بيانات النشاط. بانتظار موافقة المشرف.';
+  String get businessSaveSuccess => 'تم حفظ بيانات النشاط. بانتظار موافقة المشرف.';
 
   @override
   String get businessUploadSuccess => 'تم رفع الصورة بنجاح.';
@@ -212,8 +252,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get businessNeedCategory => 'اختر فئة للنشاط التجاري.';
 
   @override
-  String get businessOwnerUpgradeSuccess =>
-      'تم تفعيل حساب المالك. بإمكانك إدارة نشاطك الآن.';
+  String get businessOwnerUpgradeSuccess => 'تم تفعيل حساب المالك. بإمكانك إدارة نشاطك الآن.';
 
   @override
   String get businessAddImage => 'إضافة صورة';
@@ -249,8 +288,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentsUpgradeTitle => 'ترقية الباقة';
 
   @override
-  String get paymentsUpgradeDescription =>
-      'سيتم فتح بوابة الدفع في المتصفح. الدفعات غير مفعّلة بعد—هذا المسار تجريبي لحين اكتمال مرحلة المدفوعات.';
+  String get paymentsUpgradeDescription => 'سيتم فتح بوابة الدفع في المتصفح. الدفعات غير مفعّلة بعد—هذا المسار تجريبي لحين اكتمال مرحلة المدفوعات.';
 
   @override
   String get paymentsStandardPlan => 'باقة ستاندرد';
@@ -301,8 +339,81 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aiSearchClearButton => 'مسح اقتراحات الذكاء';
 
   @override
-  String get aiSearchEmptyHint =>
-      'جرّب المساعد الذكي ليقترح لك خيارات مناسبة لبحثك.';
+  String get aiSearchEmptyHint => 'جرّب المساعد الذكي ليقترح لك خيارات مناسبة لبحثك.';
+
+  @override
+  String get categoriesTitle => 'تصفح الفئات';
+
+  @override
+  String get categoriesEmpty => 'لا توجد فئات متاحة بعد.';
+
+  @override
+  String get categoriesViewAll => 'عرض الكل';
+
+  @override
+  String get categoriesNoSubcategories => 'لا توجد فئات فرعية بعد.';
+
+  @override
+  String get categoriesNoBusinesses => 'لا توجد أنشطة في هذه الفئة حاليًا.';
+
+  @override
+  String categoriesRadiusLabel(Object radiusKm) {
+    return 'عرض ضمن $radiusKm كم';
+  }
+
+  @override
+  String get businessAddressLabel => 'العنوان';
+
+  @override
+  String get businessAddressHint => 'مثال: وسط المدينة، شارع الشيخ زايد';
+
+  @override
+  String get businessRegionLabel => 'المنطقة المخدومة';
+
+  @override
+  String get businessRegionHint => 'يظهر في الملف، مثال: الساحل الشمالي';
+
+  @override
+  String get businessContactSection => 'وسائل التواصل والحسابات';
+
+  @override
+  String get businessPhoneLabel => 'رقم الهاتف';
+
+  @override
+  String get businessPhoneHint => 'أدخل رمز الدولة مثال: ‎+971…';
+
+  @override
+  String get businessWhatsappLabel => 'واتساب';
+
+  @override
+  String get businessWhatsappHint => 'رقم واتساب مع رمز الدولة';
+
+  @override
+  String get businessEmailLabel => 'البريد للتواصل';
+
+  @override
+  String get businessWebsiteLabel => 'الموقع الإلكتروني';
+
+  @override
+  String get businessInstagramLabel => 'إنستغرام';
+
+  @override
+  String get businessFacebookLabel => 'فيسبوك';
+
+  @override
+  String get businessPriceInfoLabel => 'الأسعار / العروض';
+
+  @override
+  String get businessPriceInfoHint => 'شارك أهم الأسعار أو عروض الوقود.';
+
+  @override
+  String get businessDetailsCallAction => 'اتصال';
+
+  @override
+  String get businessDetailsWhatsAppAction => 'واتساب';
+
+  @override
+  String get businessDetailsMapsAction => 'الاتجاهات';
 
   @override
   String get settingsAppearanceTitle => 'المظهر واللغة';

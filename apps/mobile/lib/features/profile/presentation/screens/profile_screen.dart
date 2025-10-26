@@ -17,6 +17,10 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authStateChangesProvider);
+    final settings = ref.watch(settingsControllerProvider);
+    final settingsNotifier = ref.read(
+      settingsControllerProvider.notifier,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +32,19 @@ class ProfileScreen extends ConsumerWidget {
         error: (error, _) => Center(child: Text(error.toString())),
         data: (user) {
           if (user == null) {
-            return const _AuthFormsCard();
+            return ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const _AuthFormsCard(),
+                const SizedBox(height: 24),
+                _SettingsCard(
+                  l10n: l10n,
+                  settings: settings,
+                  onThemeChanged: settingsNotifier.updateThemeMode,
+                  onLocaleChanged: settingsNotifier.updateLocale,
+                ),
+              ],
+            );
           }
 
           final userDocAsync = ref.watch(currentUserDocProvider);
@@ -41,11 +57,6 @@ class ProfileScreen extends ConsumerWidget {
               final plan = data['plan'] as String? ?? 'free';
               final name = data['name'] as String? ?? user.displayName ?? '—';
               final email = user.email ?? '—';
-              final settings = ref.watch(settingsControllerProvider);
-              final settingsNotifier = ref.read(
-                settingsControllerProvider.notifier,
-              );
-
               return ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
@@ -83,7 +94,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (role != 'owner')
+                  if (role == 'user')
                     OutlinedButton.icon(
                       onPressed: () async {
                         await ref
@@ -100,7 +111,7 @@ class ProfileScreen extends ConsumerWidget {
                       icon: const Icon(Icons.storefront_outlined),
                       label: Text(l10n.authBecomeOwner),
                     ),
-                  if (role != 'owner')
+                  if (role == 'user')
                     Padding(
                       padding: const EdgeInsets.only(top: 8, bottom: 16),
                       child: Text(

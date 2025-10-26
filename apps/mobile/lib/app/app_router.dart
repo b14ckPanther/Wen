@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/explore/presentation/screens/explore_screen.dart';
+import '../features/categories/presentation/screens/categories_screen.dart';
+import '../features/categories/presentation/screens/category_detail_screen.dart';
 import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/navigation/presentation/wen_shell.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
@@ -12,11 +14,15 @@ import '../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import '../features/admin/application/admin_providers.dart';
 import '../features/auth/application/auth_providers.dart';
 import '../features/businesses/data/models/business.dart';
+import '../features/businesses/data/models/business_category.dart';
 import '../features/businesses/presentation/screens/business_details_screen.dart';
 import 'routes/app_routes.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _exploreNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'explore');
+final _categoriesNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'categories',
+);
 final _searchNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'search');
 final _favoritesNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'favorites',
@@ -47,6 +53,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: AppRoutePath.explore,
                 name: 'explore',
                 builder: (context, state) => const ExploreScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _categoriesNavigatorKey,
+            routes: [
+              GoRoute(
+                path: AppRoutePath.categories,
+                name: 'categories',
+                builder: (context, state) => const CategoriesScreen(),
               ),
             ],
           ),
@@ -105,6 +121,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return BusinessDetailsScreen(
             businessId: id,
             initialBusiness: business,
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutePath.categoryDetails,
+        name: 'category-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          final extra = state.extra;
+          final category = extra is BusinessCategory ? extra : null;
+          return CategoryDetailScreen(
+            categoryId: id,
+            initialCategoryName: category?.name,
           );
         },
       ),

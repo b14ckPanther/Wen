@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/legacy.dart' as legacy;
 import 'package:geolocator/geolocator.dart';
 import 'package:state_notifier/state_notifier.dart';
 
+import '../domain/location_region.dart';
+
 const GeoPoint kFallbackGeoCenter = GeoPoint(25.2048, 55.2708);
 bool kForceLocationTestMode = false;
 bool get _isRunningTests =>
@@ -23,6 +25,8 @@ enum LocationStatus {
   error,
 }
 
+const _unset = Object();
+
 @immutable
 class LocationState {
   const LocationState({
@@ -30,8 +34,10 @@ class LocationState {
     required this.center,
     required this.canRequestPermission,
     required this.isLoading,
+    required this.useDeviceLocation,
     this.position,
     this.errorMessage,
+    this.selectedRegionId,
   });
 
   factory LocationState.initial() => const LocationState(
@@ -39,30 +45,41 @@ class LocationState {
     center: kFallbackGeoCenter,
     canRequestPermission: true,
     isLoading: true,
+    useDeviceLocation: true,
+    selectedRegionId: null,
   );
 
   final LocationStatus status;
   final GeoPoint center;
   final bool canRequestPermission;
   final bool isLoading;
+  final bool useDeviceLocation;
   final Position? position;
   final String? errorMessage;
+  final String? selectedRegionId;
 
   LocationState copyWith({
     LocationStatus? status,
     GeoPoint? center,
     bool? canRequestPermission,
     bool? isLoading,
-    Position? position,
-    String? errorMessage,
+    Object? position = _unset,
+    Object? errorMessage = _unset,
+    bool? useDeviceLocation,
+    Object? selectedRegionId = _unset,
   }) {
     return LocationState(
       status: status ?? this.status,
       center: center ?? this.center,
       canRequestPermission: canRequestPermission ?? this.canRequestPermission,
       isLoading: isLoading ?? this.isLoading,
-      position: position ?? this.position,
-      errorMessage: errorMessage ?? this.errorMessage,
+      position: position == _unset ? this.position : position as Position?,
+      errorMessage:
+          errorMessage == _unset ? this.errorMessage : errorMessage as String?,
+      useDeviceLocation: useDeviceLocation ?? this.useDeviceLocation,
+      selectedRegionId: selectedRegionId == _unset
+          ? this.selectedRegionId
+          : selectedRegionId as String?,
     );
   }
 }
@@ -75,6 +92,7 @@ class LocationController extends StateNotifier<LocationState> {
   }
 
   Future<void> refresh() async {
+    if (!state.useDeviceLocation) return;
     state = state.copyWith(isLoading: true, status: LocationStatus.checking);
     await _resolveLocation();
   }
@@ -87,6 +105,10 @@ class LocationController extends StateNotifier<LocationState> {
           status: LocationStatus.ready,
           center: kFallbackGeoCenter,
           isLoading: false,
+          useDeviceLocation: true,
+          selectedRegionId: null,
+          position: null,
+          errorMessage: null,
         );
         return;
       }
@@ -128,11 +150,23 @@ class LocationController extends StateNotifier<LocationState> {
         errorMessage: null,
       );
 
+      if (!state.useDeviceLocation) {
+        state = state.copyWith(
+          status: LocationStatus.ready,
+          isLoading: false,
+        );
+        return;
+      }
+
       if (_isRunningTests) {
         state = state.copyWith(
           status: LocationStatus.ready,
           center: kFallbackGeoCenter,
           isLoading: false,
+          useDeviceLocation: true,
+          selectedRegionId: null,
+          position: null,
+          errorMessage: null,
         );
         return;
       }
@@ -200,6 +234,33 @@ class LocationController extends StateNotifier<LocationState> {
       );
     }
   }
+
+  Future<void> setUseDeviceLocation(bool useDeviceLocation) async {
+    if (useDeviceLocation == state.useDeviceLocation) return;
+    state = state.copyWith(
+      useDeviceLocation: useDeviceLocation,
+      selectedRegionId: useDeviceLocation ? null : state.selectedRegionId,
+      status: useDeviceLocation ? LocationStatus.checking : LocationStatus.ready,
+      isLoading: useDeviceLocation,
+      position: useDeviceLocation ? state.position : null,
+      errorMessage: null,
+    );
+    if (useDeviceLocation) {
+      await _resolveLocation();
+    }
+  }
+
+  void selectPresetRegion(LocationRegion region) {
+    state = state.copyWith(
+      center: region.center,
+      status: LocationStatus.ready,
+      isLoading: false,
+      useDeviceLocation: false,
+      selectedRegionId: region.id,
+      position: null,
+      errorMessage: null,
+    );
+  }
 }
 
 final locationControllerProvider =
@@ -212,4 +273,8 @@ final locationControllerProvider =
 final activeGeoCenterProvider = Provider<GeoPoint>((ref) {
   final state = ref.watch(locationControllerProvider);
   return state.center;
+});
+
+final presetRegionsProvider = Provider<List<LocationRegion>>((ref) {
+  return presetRegions;
 });

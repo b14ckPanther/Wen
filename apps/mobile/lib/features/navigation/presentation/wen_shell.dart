@@ -25,6 +25,11 @@ class WenShell extends StatelessWidget {
         selectedIcon: Icons.explore,
       ),
       (
+        label: l10n.tabCategories,
+        icon: Icons.dashboard_outlined,
+        selectedIcon: Icons.dashboard,
+      ),
+      (
         label: l10n.tabSearch,
         icon: Icons.search_outlined,
         selectedIcon: Icons.search,

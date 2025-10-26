@@ -17,6 +17,15 @@ class Business {
     required this.createdAt,
     required this.updatedAt,
     required this.searchKeywords,
+    this.phoneNumber,
+    this.whatsappNumber,
+    this.contactEmail,
+    this.website,
+    this.instagram,
+    this.facebook,
+    this.addressLine,
+    this.priceInfo,
+    this.regionLabel,
   });
 
   factory Business.fromDocument(
@@ -42,6 +51,15 @@ class Business {
           .whereType<String>()
           .map((keyword) => keyword.toLowerCase())
           .toList(),
+      phoneNumber: data['phoneNumber'] as String?,
+      whatsappNumber: data['whatsappNumber'] as String?,
+      contactEmail: data['contactEmail'] as String?,
+      website: data['website'] as String?,
+      instagram: data['instagram'] as String?,
+      facebook: data['facebook'] as String?,
+      addressLine: data['addressLine'] as String?,
+      priceInfo: data['priceInfo'] as String?,
+      regionLabel: data['regionLabel'] as String?,
     );
   }
 
@@ -58,6 +76,15 @@ class Business {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<String> searchKeywords;
+  final String? phoneNumber;
+  final String? whatsappNumber;
+  final String? contactEmail;
+  final String? website;
+  final String? instagram;
+  final String? facebook;
+  final String? addressLine;
+  final String? priceInfo;
+  final String? regionLabel;
 
   String get nameLowercase => name.toLowerCase();
 
@@ -84,4 +111,17 @@ class Business {
   }
 
   double _degreesToRadians(double degrees) => degrees * (pi / 180.0);
+
+  bool get hasDirectContact =>
+      (phoneNumber != null && phoneNumber!.isNotEmpty) ||
+      (whatsappNumber != null && whatsappNumber!.isNotEmpty) ||
+      (contactEmail != null && contactEmail!.isNotEmpty);
+
+  String googleMapsUrl() {
+    return 'https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}';
+  }
+
+  String wazeUrl() {
+    return 'https://waze.com/ul?ll=${location.latitude},${location.longitude}&navigate=yes';
+  }
 }

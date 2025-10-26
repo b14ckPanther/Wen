@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/models/business.dart';
 
@@ -16,12 +17,42 @@ class BusinessListTile extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onViewOnMap;
 
+  Uri? get _phoneUri {
+    final phone = business.phoneNumber;
+    if (phone == null || phone.isEmpty) return null;
+    return Uri(scheme: 'tel', path: phone);
+  }
+
+  Uri? get _whatsappUri {
+    final whatsapp = business.whatsappNumber;
+    if (whatsapp == null || whatsapp.isEmpty) return null;
+    final normalised = whatsapp.replaceAll(RegExp(r'[^0-9+]'), '');
+    return Uri.parse('https://wa.me/${normalised.replaceAll('+', '')}');
+  }
+
+  Uri get _mapsUri => Uri.parse(business.googleMapsUrl());
+
+  Future<void> _launchUri(BuildContext context, Uri? uri) async {
+    if (uri == null) return;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched) {
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text('Could not open ${uri.toString()}'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final distanceLabel = distanceKm != null
         ? '${distanceKm!.toStringAsFixed(1)} km'
         : null;
+    final phoneUri = _phoneUri;
+    final whatsappUri = _whatsappUri;
 
     return Card(
       child: ListTile(
@@ -84,11 +115,29 @@ class BusinessListTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (phoneUri != null)
+              IconButton(
+                icon: const Icon(Icons.call),
+                tooltip: 'Call',
+                onPressed: () => _launchUri(context, phoneUri),
+              ),
+            if (whatsappUri != null)
+              IconButton(
+                icon: const Icon(Icons.chat_outlined),
+                tooltip: 'WhatsApp',
+                onPressed: () => _launchUri(context, whatsappUri),
+              ),
             if (onViewOnMap != null)
               IconButton(
                 icon: const Icon(Icons.map_outlined),
                 tooltip: 'View on map',
                 onPressed: onViewOnMap,
+              ),
+            if (onViewOnMap == null)
+              IconButton(
+                icon: const Icon(Icons.place_outlined),
+                tooltip: 'Directions',
+                onPressed: () => _launchUri(context, _mapsUri),
               ),
             const Icon(Icons.chevron_right),
           ],

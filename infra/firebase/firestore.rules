@@ -44,13 +44,25 @@ service cloud.firestore {
           'description',
           'categoryId',
           'location',
+          'locationLat',
+          'locationLng',
+          'geohash',
           'ownerId',
           'plan',
-        'images',
-        'approved',
-        'createdAt',
-        'updatedAt',
-        'searchKeywords'
+          'images',
+          'approved',
+          'createdAt',
+          'updatedAt',
+          'searchKeywords',
+          'addressLine',
+          'regionLabel',
+          'phoneNumber',
+          'whatsappNumber',
+          'contactEmail',
+          'website',
+          'instagram',
+          'facebook',
+          'priceInfo'
       ])
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
@@ -58,10 +70,32 @@ service cloud.firestore {
         && request.resource.data.categoryId is string
       && request.resource.data.ownerId is string
         && request.resource.data.location is latlng
+      && request.resource.data.locationLat is number
+      && request.resource.data.locationLng is number
+      && request.resource.data.geohash is string
+      && request.resource.data.geohash.size() > 0
       && request.resource.data.images is list
       && request.resource.data.images.size() <= 12
       && (!request.resource.data.keys().hasAny(['searchKeywords'])
           || request.resource.data.searchKeywords is list)
+      && (!request.resource.data.keys().hasAny(['addressLine'])
+          || request.resource.data.addressLine is string)
+      && (!request.resource.data.keys().hasAny(['regionLabel'])
+          || request.resource.data.regionLabel is string)
+      && (!request.resource.data.keys().hasAny(['phoneNumber'])
+          || request.resource.data.phoneNumber is string)
+      && (!request.resource.data.keys().hasAny(['whatsappNumber'])
+          || request.resource.data.whatsappNumber is string)
+      && (!request.resource.data.keys().hasAny(['contactEmail'])
+          || request.resource.data.contactEmail is string)
+      && (!request.resource.data.keys().hasAny(['website'])
+          || request.resource.data.website is string)
+      && (!request.resource.data.keys().hasAny(['instagram'])
+          || request.resource.data.instagram is string)
+      && (!request.resource.data.keys().hasAny(['facebook'])
+          || request.resource.data.facebook is string)
+      && (!request.resource.data.keys().hasAny(['priceInfo'])
+          || request.resource.data.priceInfo is string)
       && request.resource.data.approved is bool
       && validPlan(request.resource.data.plan)
       && request.resource.data.createdAt is timestamp

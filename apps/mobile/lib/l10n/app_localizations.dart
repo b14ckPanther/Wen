@@ -62,8 +62,7 @@ import 'app_localizations_en.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -71,8 +70,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -84,18 +82,17 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
-    Locale('en'),
+    Locale('en')
   ];
 
   /// No description provided for @appTitle.
@@ -115,6 +112,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Explore'**
   String get tabExplore;
+
+  /// No description provided for @tabCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get tabCategories;
 
   /// No description provided for @tabSearch.
   ///
@@ -182,6 +185,66 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get exploreLocationRetry;
 
+  /// No description provided for @exploreUseMyLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your current location'**
+  String get exploreUseMyLocationTitle;
+
+  /// No description provided for @exploreManualRegionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse by region'**
+  String get exploreManualRegionTitle;
+
+  /// No description provided for @exploreUseMyLocationToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use GPS location'**
+  String get exploreUseMyLocationToggle;
+
+  /// No description provided for @exploreUseMyLocationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh to pull nearby businesses automatically.'**
+  String get exploreUseMyLocationSubtitle;
+
+  /// No description provided for @exploreManualRegionToggleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a preset region to explore anywhere.'**
+  String get exploreManualRegionToggleSubtitle;
+
+  /// No description provided for @exploreManualRegionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select region'**
+  String get exploreManualRegionLabel;
+
+  /// No description provided for @exploreRefreshLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh location'**
+  String get exploreRefreshLocation;
+
+  /// No description provided for @exploreSearchShortcut.
+  ///
+  /// In en, this message translates to:
+  /// **'Search businesses, categories, or services…'**
+  String get exploreSearchShortcut;
+
+  /// No description provided for @exploreSearchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get exploreSearchAction;
+
+  /// No description provided for @exploreFeaturedCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular categories this week'**
+  String get exploreFeaturedCategories;
+
   /// No description provided for @searchPlaceholder.
   ///
   /// In en, this message translates to:
@@ -241,6 +304,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get searchAll;
+
+  /// No description provided for @regionNorth.
+  ///
+  /// In en, this message translates to:
+  /// **'North'**
+  String get regionNorth;
+
+  /// No description provided for @regionSouth.
+  ///
+  /// In en, this message translates to:
+  /// **'South'**
+  String get regionSouth;
+
+  /// No description provided for @regionEast.
+  ///
+  /// In en, this message translates to:
+  /// **'East'**
+  String get regionEast;
+
+  /// No description provided for @regionWest.
+  ///
+  /// In en, this message translates to:
+  /// **'West'**
+  String get regionWest;
+
+  /// No description provided for @regionCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Center'**
+  String get regionCenter;
 
   /// No description provided for @profileSignInCta.
   ///
@@ -668,6 +761,150 @@ abstract class AppLocalizations {
   /// **'Try the AI assistant to get curated picks for your query.'**
   String get aiSearchEmptyHint;
 
+  /// No description provided for @categoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse categories'**
+  String get categoriesTitle;
+
+  /// No description provided for @categoriesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories available yet.'**
+  String get categoriesEmpty;
+
+  /// No description provided for @categoriesViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get categoriesViewAll;
+
+  /// No description provided for @categoriesNoSubcategories.
+  ///
+  /// In en, this message translates to:
+  /// **'No subcategories yet.'**
+  String get categoriesNoSubcategories;
+
+  /// No description provided for @categoriesNoBusinesses.
+  ///
+  /// In en, this message translates to:
+  /// **'No businesses match this category yet.'**
+  String get categoriesNoBusinesses;
+
+  /// No description provided for @categoriesRadiusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing within {radiusKm} km'**
+  String categoriesRadiusLabel(Object radiusKm);
+
+  /// No description provided for @businessAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get businessAddressLabel;
+
+  /// No description provided for @businessAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Downtown Dubai, Sheikh Zayed Rd'**
+  String get businessAddressHint;
+
+  /// No description provided for @businessRegionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Service region'**
+  String get businessRegionLabel;
+
+  /// No description provided for @businessRegionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Displayed label, e.g. North Coast'**
+  String get businessRegionHint;
+
+  /// No description provided for @businessContactSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact & social'**
+  String get businessContactSection;
+
+  /// No description provided for @businessPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get businessPhoneLabel;
+
+  /// No description provided for @businessPhoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Include country code e.g. +971…'**
+  String get businessPhoneHint;
+
+  /// No description provided for @businessWhatsappLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get businessWhatsappLabel;
+
+  /// No description provided for @businessWhatsappHint.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp number with country code'**
+  String get businessWhatsappHint;
+
+  /// No description provided for @businessEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact email'**
+  String get businessEmailLabel;
+
+  /// No description provided for @businessWebsiteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get businessWebsiteLabel;
+
+  /// No description provided for @businessInstagramLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Instagram'**
+  String get businessInstagramLabel;
+
+  /// No description provided for @businessFacebookLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Facebook'**
+  String get businessFacebookLabel;
+
+  /// No description provided for @businessPriceInfoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price / offers'**
+  String get businessPriceInfoLabel;
+
+  /// No description provided for @businessPriceInfoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share pricing highlights or fuel prices.'**
+  String get businessPriceInfoHint;
+
+  /// No description provided for @businessDetailsCallAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get businessDetailsCallAction;
+
+  /// No description provided for @businessDetailsWhatsAppAction.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get businessDetailsWhatsAppAction;
+
+  /// No description provided for @businessDetailsMapsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Directions'**
+  String get businessDetailsMapsAction;
+
   /// No description provided for @settingsAppearanceTitle.
   ///
   /// In en, this message translates to:
@@ -723,8 +960,7 @@ abstract class AppLocalizations {
   String get settingsLoading;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -733,26 +969,25 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['ar', 'en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar':
-      return AppLocalizationsAr();
-    case 'en':
-      return AppLocalizationsEn();
+    case 'ar': return AppLocalizationsAr();
+    case 'en': return AppLocalizationsEn();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }

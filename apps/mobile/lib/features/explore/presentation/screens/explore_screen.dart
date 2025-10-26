@@ -6,10 +6,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../businesses/application/business_repository_provider.dart';
 import '../../../businesses/application/business_search_controller.dart';
 import '../../../businesses/data/models/business.dart';
+import '../../../businesses/data/models/business_category.dart';
 import '../../../businesses/presentation/widgets/business_list_tile.dart';
 import '../../../location/application/location_controller.dart';
+import '../../../location/domain/location_region.dart';
 
 bool kForceExploreTestMode = false;
 bool get _kIsRunningTests =>
@@ -64,6 +67,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       'business-details',
       pathParameters: {'id': business.id},
       extra: business,
+    );
+  }
+
+  void _openCategory(String categoryId) {
+    if (!mounted) return;
+    context.pushNamed(
+      'category-detail',
+      pathParameters: {'id': categoryId},
     );
   }
 
@@ -160,8 +171,19 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     });
     final businessesAsync = ref.watch(nearbyBusinessesProvider);
     final locationState = ref.watch(locationControllerProvider);
+    final locationNotifier = ref.read(locationControllerProvider.notifier);
     final center = locationState.center;
     final hasLocation = locationState.status == LocationStatus.ready;
+    final useDeviceLocation = locationState.useDeviceLocation;
+    final regions = ref.watch(presetRegionsProvider);
+    final categoriesAsync = ref.watch(businessCategoriesProvider);
+    LocationRegion? selectedRegion;
+    if (!useDeviceLocation && regions.isNotEmpty) {
+      selectedRegion = regions.firstWhere(
+        (region) => region.id == locationState.selectedRegionId,
+        orElse: () => regions.first,
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -208,8 +230,186 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      if (banner != null) banner,
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                useDeviceLocation
+                                    ? l10n.exploreUseMyLocationTitle
+                                    : l10n.exploreManualRegionTitle,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              SwitchListTile.adaptive(
+                                value: useDeviceLocation,
+                                onChanged: (value) {
+                                  locationNotifier.setUseDeviceLocation(value);
+                                  if (!value && regions.isNotEmpty) {
+                                    locationNotifier.selectPresetRegion(
+                                      regions.first,
+                                    );
+                                  }
+                                },
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(l10n.exploreUseMyLocationToggle),
+                                subtitle: Text(
+                                  useDeviceLocation
+                                      ? l10n.exploreUseMyLocationSubtitle
+                                      : l10n
+                                          .exploreManualRegionToggleSubtitle,
+                                ),
+                              ),
+                              if (!useDeviceLocation) ...[
+                                const SizedBox(height: 12),
+                                DropdownMenu<LocationRegion>(
+                                  initialSelection: selectedRegion,
+                                  label: Text(l10n.exploreManualRegionLabel),
+                                  dropdownMenuEntries: [
+                                    for (final region in regions)
+                                      DropdownMenuEntry(
+                                        value: region,
+                                        label: region.label(l10n),
+                                      ),
+                                  ],
+                                  onSelected: (region) {
+                                    if (region != null) {
+                                      locationNotifier.selectPresetRegion(
+                                        region,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                              const SizedBox(height: 12),
+                              FilledButton.tonalIcon(
+                                onPressed: useDeviceLocation
+                                    ? _refreshLocation
+                                    : () {
+                                        final region = selectedRegion ??
+                                            (regions.isNotEmpty
+                                                ? regions.first
+                                                : null);
+                                        if (region != null) {
+                                          locationNotifier.selectPresetRegion(
+                                            region,
+                                          );
+                                        }
+                                      },
+                                icon: const Icon(Icons.my_location),
+                                label: Text(l10n.exploreRefreshLocation),
+                              ),
+                              if (banner != null) ...[
+                                const SizedBox(height: 12),
+                                banner,
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: () => context.goNamed('search'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 18,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHigh,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.search),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  l10n.exploreSearchShortcut,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                l10n.exploreSearchAction,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      categoriesAsync.when(
+                        loading: () => const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        error: (error, _) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            'Failed to load categories: $error',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.error,
+                            ),
+                          ),
+                        ),
+                        data: (categories) {
+                          final topLevel = categories
+                              .where(
+                                (c) =>
+                                    c.parentId == null ||
+                                    (c.parentId?.isEmpty ?? true),
+                              )
+                              .toList();
+                          if (topLevel.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.exploreFeaturedCategories,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 140,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: topLevel.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 12),
+                                  itemBuilder: (context, index) {
+                                    final category = topLevel[index];
+                                    return _CategoryPreviewCard(
+                                      category: category,
+                                      onTap: () =>
+                                          _openCategory(category.id),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: SizedBox(
@@ -293,6 +493,59 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _CategoryPreviewCard extends StatelessWidget {
+  const _CategoryPreviewCard({
+    required this.category,
+    required this.onTap,
+  });
+
+  final BusinessCategory category;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Ink(
+        width: 150,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          gradient: LinearGradient(
+            colors: [
+              theme.colorScheme.primary.withValues(alpha: 0.85),
+              theme.colorScheme.primaryContainer,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.category_outlined,
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
+            const Spacer(),
+            Text(
+              category.name,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.w700,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }

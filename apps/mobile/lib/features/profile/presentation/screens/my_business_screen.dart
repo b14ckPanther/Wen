@@ -21,6 +21,15 @@ class _MyBusinessScreenState extends ConsumerState<MyBusinessScreen> {
   final _descriptionController = TextEditingController();
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _regionLabelController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _whatsappController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _websiteController = TextEditingController();
+  final _instagramController = TextEditingController();
+  final _facebookController = TextEditingController();
+  final _priceInfoController = TextEditingController();
 
   String? _selectedCategory;
   List<String> _images = const [];
@@ -34,6 +43,15 @@ class _MyBusinessScreenState extends ConsumerState<MyBusinessScreen> {
     _descriptionController.dispose();
     _latitudeController.dispose();
     _longitudeController.dispose();
+    _addressController.dispose();
+    _regionLabelController.dispose();
+    _phoneController.dispose();
+    _whatsappController.dispose();
+    _emailController.dispose();
+    _websiteController.dispose();
+    _instagramController.dispose();
+    _facebookController.dispose();
+    _priceInfoController.dispose();
     super.dispose();
   }
 
@@ -46,6 +64,15 @@ class _MyBusinessScreenState extends ConsumerState<MyBusinessScreen> {
     _longitudeController.text = business.location.longitude.toStringAsFixed(6);
     _selectedCategory = business.categoryId;
     _images = business.images;
+    _addressController.text = business.addressLine ?? '';
+    _regionLabelController.text = business.regionLabel ?? '';
+    _phoneController.text = business.phoneNumber ?? '';
+    _whatsappController.text = business.whatsappNumber ?? '';
+    _emailController.text = business.contactEmail ?? '';
+    _websiteController.text = business.website ?? '';
+    _instagramController.text = business.instagram ?? '';
+    _facebookController.text = business.facebook ?? '';
+    _priceInfoController.text = business.priceInfo ?? '';
   }
 
   Future<void> _saveBusiness({
@@ -77,16 +104,43 @@ class _MyBusinessScreenState extends ConsumerState<MyBusinessScreen> {
     setState(() => _isSaving = true);
     final repository = ref.read(businessRepositoryProvider);
     try {
-      await repository.upsertBusiness(
-        ownerId: ownerId,
-        documentId: existing?.id,
-        name: name,
-        description: description,
-        categoryId: categoryId,
-        location: GeoPoint(latitude, longitude),
-        images: _images,
-        existing: existing,
-      );
+        await repository.upsertBusiness(
+          ownerId: ownerId,
+          documentId: existing?.id,
+          name: name,
+          description: description,
+          categoryId: categoryId,
+          location: GeoPoint(latitude, longitude),
+          images: _images,
+          existing: existing,
+          addressLine: _addressController.text.trim().isEmpty
+              ? null
+              : _addressController.text.trim(),
+          regionLabel: _regionLabelController.text.trim().isEmpty
+              ? null
+              : _regionLabelController.text.trim(),
+          phoneNumber: _phoneController.text.trim().isEmpty
+              ? null
+              : _phoneController.text.trim(),
+          whatsappNumber: _whatsappController.text.trim().isEmpty
+              ? null
+              : _whatsappController.text.trim(),
+          contactEmail: _emailController.text.trim().isEmpty
+              ? null
+              : _emailController.text.trim(),
+          website: _websiteController.text.trim().isEmpty
+              ? null
+              : _websiteController.text.trim(),
+          instagram: _instagramController.text.trim().isEmpty
+              ? null
+              : _instagramController.text.trim(),
+          facebook: _facebookController.text.trim().isEmpty
+              ? null
+              : _facebookController.text.trim(),
+          priceInfo: _priceInfoController.text.trim().isEmpty
+              ? null
+              : _priceInfoController.text.trim(),
+        );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -257,6 +311,88 @@ class _MyBusinessScreenState extends ConsumerState<MyBusinessScreen> {
                                 ),
                               ),
                             ],
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _addressController,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessAddressLabel,
+                              helperText: l10n.businessAddressHint,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _regionLabelController,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessRegionLabel,
+                              helperText: l10n.businessRegionHint,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            l10n.businessContactSection,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessPhoneLabel,
+                              helperText: l10n.businessPhoneHint,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _whatsappController,
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessWhatsappLabel,
+                              helperText: l10n.businessWhatsappHint,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessEmailLabel,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _websiteController,
+                            keyboardType: TextInputType.url,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessWebsiteLabel,
+                              helperText: 'https://',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _instagramController,
+                            keyboardType: TextInputType.url,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessInstagramLabel,
+                              helperText: '@username or URL',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _facebookController,
+                            keyboardType: TextInputType.url,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessFacebookLabel,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _priceInfoController,
+                            decoration: InputDecoration(
+                              labelText: l10n.businessPriceInfoLabel,
+                              helperText: l10n.businessPriceInfoHint,
+                            ),
+                            maxLines: 2,
                           ),
                           const SizedBox(height: 16),
                           Text(

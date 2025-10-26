@@ -18,6 +18,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabExplore => 'Explore';
 
   @override
+  String get tabCategories => 'Categories';
+
+  @override
   String get tabSearch => 'Search';
 
   @override
@@ -30,29 +33,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreHeadline => 'Discover trending businesses near you';
 
   @override
-  String get exploreLocationPermissionRequired =>
-      'Enable location access to find nearby businesses.';
+  String get exploreLocationPermissionRequired => 'Enable location access to find nearby businesses.';
 
   @override
   String get exploreLocationPermissionCta => 'Enable';
 
   @override
-  String get exploreLocationPermissionDeniedForever =>
-      'Location access is blocked. Update your settings to continue.';
+  String get exploreLocationPermissionDeniedForever => 'Location access is blocked. Update your settings to continue.';
 
   @override
   String get exploreLocationOpenSettings => 'Settings';
 
   @override
-  String get exploreLocationServicesDisabled =>
-      'Location services are turned off on your device.';
+  String get exploreLocationServicesDisabled => 'Location services are turned off on your device.';
 
   @override
-  String get exploreLocationErrorGeneric =>
-      'We could not determine your location.';
+  String get exploreLocationErrorGeneric => 'We could not determine your location.';
 
   @override
   String get exploreLocationRetry => 'Retry';
+
+  @override
+  String get exploreUseMyLocationTitle => 'Use your current location';
+
+  @override
+  String get exploreManualRegionTitle => 'Browse by region';
+
+  @override
+  String get exploreUseMyLocationToggle => 'Use GPS location';
+
+  @override
+  String get exploreUseMyLocationSubtitle => 'Refresh to pull nearby businesses automatically.';
+
+  @override
+  String get exploreManualRegionToggleSubtitle => 'Choose a preset region to explore anywhere.';
+
+  @override
+  String get exploreManualRegionLabel => 'Select region';
+
+  @override
+  String get exploreRefreshLocation => 'Refresh location';
+
+  @override
+  String get exploreSearchShortcut => 'Search businesses, categories, or services…';
+
+  @override
+  String get exploreSearchAction => 'Search';
+
+  @override
+  String get exploreFeaturedCategories => 'Popular categories this week';
 
   @override
   String get searchPlaceholder => 'Search for businesses or categories';
@@ -61,15 +90,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favoritesEmptyTitle => 'No favorites yet';
 
   @override
-  String get favoritesEmptySubtitle =>
-      'Save businesses to compare plans and keep them handy.';
+  String get favoritesEmptySubtitle => 'Save businesses to compare plans and keep them handy.';
 
   @override
   String get profileGuestTitle => 'Welcome to Wen';
 
   @override
-  String get profileGuestSubtitle =>
-      'Sign in to manage your business listings and preferences.';
+  String get profileGuestSubtitle => 'Sign in to manage your business listings and preferences.';
 
   @override
   String get businessStatusOpen => 'Open now';
@@ -85,6 +112,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchAll => 'All';
+
+  @override
+  String get regionNorth => 'North';
+
+  @override
+  String get regionSouth => 'South';
+
+  @override
+  String get regionEast => 'East';
+
+  @override
+  String get regionWest => 'West';
+
+  @override
+  String get regionCenter => 'Center';
 
   @override
   String get profileSignInCta => 'Sign in';
@@ -111,8 +153,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authBecomeOwner => 'Become a business owner';
 
   @override
-  String get authBecomeOwnerSubtitle =>
-      'Owners can manage business listings in Wen';
+  String get authBecomeOwnerSubtitle => 'Owners can manage business listings in Wen';
 
   @override
   String get authManageBusiness => 'Manage my business';
@@ -142,8 +183,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authOwnerSwitchTitle => 'I am a business owner';
 
   @override
-  String get authOwnerSwitchSubtitle =>
-      'Owners can manage business listings in Wen';
+  String get authOwnerSwitchSubtitle => 'Owners can manage business listings in Wen';
 
   @override
   String get authEmailRequired => 'Please enter your email';
@@ -191,8 +231,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get businessGalleryTitle => 'Gallery';
 
   @override
-  String get businessSaveFirstMessage =>
-      'Save your business first to upload images.';
+  String get businessSaveFirstMessage => 'Save your business first to upload images.';
 
   @override
   String get businessSaveButton => 'Publish business';
@@ -201,29 +240,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get businessUpdateButton => 'Update business';
 
   @override
-  String get businessSaveSuccess =>
-      'Business details saved. Pending admin review.';
+  String get businessSaveSuccess => 'Business details saved. Pending admin review.';
 
   @override
   String get businessUploadSuccess => 'Image uploaded successfully.';
 
   @override
-  String get businessNeedCoordinates =>
-      'Enter valid coordinates for latitude and longitude.';
+  String get businessNeedCoordinates => 'Enter valid coordinates for latitude and longitude.';
 
   @override
   String get businessNeedCategory => 'Select a business category.';
 
   @override
-  String get businessOwnerUpgradeSuccess =>
-      'You are now marked as a business owner. You can manage your business below.';
+  String get businessOwnerUpgradeSuccess => 'You are now marked as a business owner. You can manage your business below.';
 
   @override
   String get businessAddImage => 'Add image';
 
   @override
-  String get businessDetailsNotFound =>
-      'We could not load this business right now.';
+  String get businessDetailsNotFound => 'We could not load this business right now.';
 
   @override
   String get businessDetailsRefreshTooltip => 'Refresh';
@@ -253,8 +288,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentsUpgradeTitle => 'Upgrade plan';
 
   @override
-  String get paymentsUpgradeDescription =>
-      'Secure checkout will open in the browser. Payments are not live yet—this flow is a stub until the payments milestone is complete.';
+  String get paymentsUpgradeDescription => 'Secure checkout will open in the browser. Payments are not live yet—this flow is a stub until the payments milestone is complete.';
 
   @override
   String get paymentsStandardPlan => 'Standard';
@@ -305,8 +339,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiSearchClearButton => 'Clear AI suggestions';
 
   @override
-  String get aiSearchEmptyHint =>
-      'Try the AI assistant to get curated picks for your query.';
+  String get aiSearchEmptyHint => 'Try the AI assistant to get curated picks for your query.';
+
+  @override
+  String get categoriesTitle => 'Browse categories';
+
+  @override
+  String get categoriesEmpty => 'No categories available yet.';
+
+  @override
+  String get categoriesViewAll => 'View all';
+
+  @override
+  String get categoriesNoSubcategories => 'No subcategories yet.';
+
+  @override
+  String get categoriesNoBusinesses => 'No businesses match this category yet.';
+
+  @override
+  String categoriesRadiusLabel(Object radiusKm) {
+    return 'Showing within $radiusKm km';
+  }
+
+  @override
+  String get businessAddressLabel => 'Address';
+
+  @override
+  String get businessAddressHint => 'e.g. Downtown Dubai, Sheikh Zayed Rd';
+
+  @override
+  String get businessRegionLabel => 'Service region';
+
+  @override
+  String get businessRegionHint => 'Displayed label, e.g. North Coast';
+
+  @override
+  String get businessContactSection => 'Contact & social';
+
+  @override
+  String get businessPhoneLabel => 'Phone number';
+
+  @override
+  String get businessPhoneHint => 'Include country code e.g. +971…';
+
+  @override
+  String get businessWhatsappLabel => 'WhatsApp';
+
+  @override
+  String get businessWhatsappHint => 'WhatsApp number with country code';
+
+  @override
+  String get businessEmailLabel => 'Contact email';
+
+  @override
+  String get businessWebsiteLabel => 'Website';
+
+  @override
+  String get businessInstagramLabel => 'Instagram';
+
+  @override
+  String get businessFacebookLabel => 'Facebook';
+
+  @override
+  String get businessPriceInfoLabel => 'Price / offers';
+
+  @override
+  String get businessPriceInfoHint => 'Share pricing highlights or fuel prices.';
+
+  @override
+  String get businessDetailsCallAction => 'Call';
+
+  @override
+  String get businessDetailsWhatsAppAction => 'WhatsApp';
+
+  @override
+  String get businessDetailsMapsAction => 'Directions';
 
   @override
   String get settingsAppearanceTitle => 'Appearance & language';

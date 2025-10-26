@@ -189,6 +189,15 @@ class BusinessRepository {
     required GeoPoint location,
     required List<String> images,
     Business? existing,
+    String? phoneNumber,
+    String? whatsappNumber,
+    String? contactEmail,
+    String? website,
+    String? instagram,
+    String? facebook,
+    String? addressLine,
+    String? priceInfo,
+    String? regionLabel,
   }) async {
     final docRef = documentId != null
         ? _collection.doc(documentId)
@@ -198,6 +207,8 @@ class BusinessRepository {
       name,
       description,
       categoryId,
+      addressLine ?? '',
+      regionLabel ?? '',
     ]);
 
     final data = <String, dynamic>{
@@ -217,6 +228,34 @@ class BusinessRepository {
         precision: 9,
       ),
     };
+
+    if (addressLine != null && addressLine.isNotEmpty) {
+      data['addressLine'] = addressLine.trim();
+    }
+    if (regionLabel != null && regionLabel.isNotEmpty) {
+      data['regionLabel'] = regionLabel.trim();
+    }
+    if (phoneNumber != null && phoneNumber.isNotEmpty) {
+      data['phoneNumber'] = phoneNumber.trim();
+    }
+    if (whatsappNumber != null && whatsappNumber.isNotEmpty) {
+      data['whatsappNumber'] = whatsappNumber.trim();
+    }
+    if (contactEmail != null && contactEmail.isNotEmpty) {
+      data['contactEmail'] = contactEmail.trim();
+    }
+    if (website != null && website.isNotEmpty) {
+      data['website'] = website.trim();
+    }
+    if (instagram != null && instagram.isNotEmpty) {
+      data['instagram'] = instagram.trim();
+    }
+    if (facebook != null && facebook.isNotEmpty) {
+      data['facebook'] = facebook.trim();
+    }
+    if (priceInfo != null && priceInfo.isNotEmpty) {
+      data['priceInfo'] = priceInfo.trim();
+    }
 
     if (existing == null) {
       data['createdAt'] = FieldValue.serverTimestamp();
