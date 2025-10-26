@@ -29,14 +29,14 @@ class AuthRepository {
     await credential.user?.updateDisplayName(name);
 
     final uid = credential.user!.uid;
-    final now = Timestamp.now();
+    final serverTime = FieldValue.serverTimestamp();
     final data = <String, dynamic>{
       'name': name,
       'email': email,
       'role': 'user',
       'plan': 'free',
-      'createdAt': now,
-      'updatedAt': now,
+      'createdAt': serverTime,
+      'updatedAt': serverTime,
       'roleStatus': asOwner ? 'pending' : 'active',
     };
     if (asOwner) {
@@ -77,15 +77,14 @@ class AuthRepository {
       throw ArgumentError.value(role, 'role', 'Invalid user role');
     }
 
-    final now = Timestamp.now();
     final data = Map<String, dynamic>.from(currentData);
 
     data['name'] ??= _auth.currentUser?.displayName ?? '';
     data['email'] ??= _auth.currentUser?.email ?? '';
     data['plan'] ??= 'free';
-    data['createdAt'] ??= now;
+    data['createdAt'] ??= FieldValue.serverTimestamp();
     data['role'] = role;
-    data['updatedAt'] = now;
+    data['updatedAt'] = FieldValue.serverTimestamp();
     data['roleStatus'] = 'active';
     data.remove('requestedRole');
 
@@ -96,17 +95,16 @@ class AuthRepository {
     required Map<String, dynamic> currentData,
   }) async {
     final uid = _auth.currentUser!.uid;
-    final now = Timestamp.now();
     final data = Map<String, dynamic>.from(currentData);
 
     data['name'] ??= _auth.currentUser?.displayName ?? '';
     data['email'] ??= _auth.currentUser?.email ?? '';
     data['plan'] ??= 'free';
     data['role'] ??= 'user';
-    data['createdAt'] ??= now;
+    data['createdAt'] ??= FieldValue.serverTimestamp();
     data['roleStatus'] = 'pending';
     data['requestedRole'] = 'owner';
-    data['updatedAt'] = now;
+    data['updatedAt'] = FieldValue.serverTimestamp();
 
     await _firestore.collection('users').doc(uid).set(data);
   }
@@ -116,7 +114,7 @@ class AuthRepository {
     await _auth.currentUser?.updateDisplayName(name);
     await _firestore.collection('users').doc(uid).update({
       'name': name,
-      'updatedAt': Timestamp.now(),
+      'updatedAt': FieldValue.serverTimestamp(),
     });
   }
 }

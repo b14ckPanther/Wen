@@ -30,8 +30,8 @@ service cloud.firestore {
     }
 
     function ensureServerTimestamp(field) {
-      return (request.method == 'create' && request.resource.data[field] == request.time)
-        || (request.method != 'create' && resource.data[field] == request.resource.data[field]);
+      return request.resource.data[field] == request.time
+        || resource.data[field] == request.resource.data[field];
     }
 
     function validPlan(plan) {
@@ -132,7 +132,7 @@ service cloud.firestore {
     }
 
     function validUserPayload() {
-      return requestHasKeys([
+      return request.resource.data.keys().hasOnly([
           'name',
           'email',
           'role',
@@ -141,6 +141,14 @@ service cloud.firestore {
           'updatedAt',
           'requestedRole',
           'roleStatus'
+        ])
+        && request.resource.data.keys().hasAll([
+          'name',
+          'email',
+          'role',
+          'plan',
+          'createdAt',
+          'updatedAt'
         ])
         && request.resource.data.name is string
         && request.resource.data.email is string
