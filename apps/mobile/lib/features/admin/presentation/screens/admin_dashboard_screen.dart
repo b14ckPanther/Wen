@@ -72,7 +72,11 @@ class AdminDashboardScreen extends ConsumerWidget {
                 return Text(l10n.adminUsersEmpty);
               }
 
-              final pendingOwnerRequests = users
+              final nonAdminUsers = users
+                  .where((user) => (user['role'] as String?) != 'admin')
+                  .toList();
+
+              final pendingOwnerRequests = nonAdminUsers
                   .where(
                     (user) => (user['requestedRole'] == 'owner' &&
                         user['roleStatus'] == 'pending'),
@@ -150,7 +154,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 12),
-                  ...users.map(
+                  ...nonAdminUsers.map(
                     (user) {
                       final status = user['roleStatus'] as String? ?? 'active';
                       return Card(

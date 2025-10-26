@@ -53,6 +53,7 @@
   "authOwnerRequestSubmitted": "تم استلام طلبك وسيتم إخطارك بعد موافقة المشرف.",
   "authOwnerRequestPending": "تم استلام طلبك. يجب انتظار موافقة المشرف قبل نشر نشاطك.",
   "authOwnerRequestRejected": "تم رفض طلبك السابق. حدّث بياناتك وقدّم الطلب مرة أخرى عند الجاهزية.",
+  "authOwnerNoSubcategories": "لا توجد فئات فرعية متاحة بعد. يرجى التواصل مع المشرف.",
   "authManageBusiness": "إدارة نشاطي التجاري",
   "authEmailLabel": "البريد الإلكتروني",
   "authPasswordLabel": "كلمة المرور",

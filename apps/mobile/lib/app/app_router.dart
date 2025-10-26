@@ -16,6 +16,7 @@ import '../features/auth/application/auth_providers.dart';
 import '../features/businesses/data/models/business.dart';
 import '../features/businesses/data/models/business_category.dart';
 import '../features/businesses/presentation/screens/business_details_screen.dart';
+import '../features/auth/presentation/screens/owner_register_screen.dart';
 import 'routes/app_routes.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -137,6 +138,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             initialCategoryName: category?.name,
           );
         },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutePath.ownerRegister,
+        name: 'owner-register',
+        builder: (context, state) => const OwnerRegisterScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

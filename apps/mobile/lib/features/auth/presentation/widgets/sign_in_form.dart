@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:mobile/l10n/app_localizations.dart';
 
@@ -99,6 +100,15 @@ class _SignInFormState extends ConsumerState<SignInForm> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(l10n.authSignInButton),
+          ),
+          TextButton(
+            onPressed: isLoading
+                ? null
+                : () {
+                    if (!context.mounted) return;
+                    context.push('/auth/owner-register');
+                  },
+            child: Text(l10n.authOwnerRequestButton),
           ),
           AuthErrorText(error: error),
         ],

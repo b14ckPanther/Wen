@@ -413,6 +413,12 @@ abstract class AppLocalizations {
   /// **'Your previous request was declined. Update your details and submit again when ready.'**
   String get authOwnerRequestRejected;
 
+  /// No description provided for @authOwnerNoSubcategories.
+  ///
+  /// In en, this message translates to:
+  /// **'No service subcategories are available yet. Please contact an admin.'**
+  String get authOwnerNoSubcategories;
+
   /// No description provided for @authManageBusiness.
   ///
   /// In en, this message translates to:

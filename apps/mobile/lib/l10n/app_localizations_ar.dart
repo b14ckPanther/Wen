@@ -168,6 +168,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authOwnerRequestRejected => 'تم رفض طلبك السابق. حدّث بياناتك وقدّم الطلب مرة أخرى عند الجاهزية.';
 
   @override
+  String get authOwnerNoSubcategories => 'لا توجد فئات فرعية متاحة بعد. يرجى التواصل مع المشرف.';
+
+  @override
   String get authManageBusiness => 'إدارة نشاطي التجاري';
 
   @override

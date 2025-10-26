@@ -102,15 +102,17 @@ export default function DashboardPage() {
         const userSnap = await getDocs(
           query(collection(db, 'users'), orderBy('updatedAt', 'desc'), limit(10))
         );
-        const userRows = userSnap.docs.map((doc) => {
-          const data = doc.data() as Record<string, unknown>;
-          return {
-            id: doc.id,
-            name: (data.name as string) ?? '—',
-            email: (data.email as string) ?? 'unknown@wen.app',
-            role: (data.role as string) ?? 'user',
-          };
-        });
+        const userRows = userSnap.docs
+          .map((doc) => {
+            const data = doc.data() as Record<string, unknown>;
+            return {
+              id: doc.id,
+              name: (data.name as string) ?? '—',
+              email: (data.email as string) ?? 'unknown@wen.app',
+              role: (data.role as string) ?? 'user',
+            };
+          })
+          .filter((user) => user.role !== 'admin');
 
         setBusinesses(businessRows);
         setUsers(userRows);

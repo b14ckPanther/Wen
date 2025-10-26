@@ -53,6 +53,7 @@
   "authOwnerRequestSubmitted": "Request received. We\u2019ll notify you once an admin approves.",
   "authOwnerRequestPending": "We received your request. An admin review is required before you can publish a business.",
   "authOwnerRequestRejected": "Your previous request was declined. Update your details and submit again when ready.",
+  "authOwnerNoSubcategories": "No service subcategories are available yet. Please contact an admin.",
   "authManageBusiness": "Manage my business",
   "authEmailLabel": "Email",
   "authPasswordLabel": "Password",

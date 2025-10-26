@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:mobile/l10n/app_localizations.dart';
 
@@ -19,8 +20,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _asOwner = true;
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -38,7 +37,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text,
-          asOwner: _asOwner,
         );
   }
 
@@ -111,17 +109,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               return null;
             },
           ),
-          const SizedBox(height: 12),
-          SwitchListTile.adaptive(
-            value: _asOwner,
-            onChanged: isLoading
-                ? null
-                : (value) => setState(() {
-                    _asOwner = value;
-                  }),
-            title: Text(l10n.authOwnerSwitchTitle),
-            subtitle: Text(l10n.authOwnerSwitchSubtitle),
-          ),
           ElevatedButton(
             onPressed: isLoading ? null : _submit,
             child: isLoading
@@ -131,6 +118,13 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(l10n.authCreateAccountButton),
+          ),
+          TextButton(
+            onPressed: () {
+              if (!context.mounted) return;
+              context.push('/auth/owner-register');
+            },
+            child: Text(l10n.authOwnerRequestButton),
           ),
           AuthErrorText(error: error),
         ],

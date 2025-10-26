@@ -168,6 +168,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authOwnerRequestRejected => 'Your previous request was declined. Update your details and submit again when ready.';
 
   @override
+  String get authOwnerNoSubcategories => 'No service subcategories are available yet. Please contact an admin.';
+
+  @override
   String get authManageBusiness => 'Manage my business';
 
   @override

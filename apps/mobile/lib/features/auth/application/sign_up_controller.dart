@@ -19,7 +19,7 @@ class SignUpController extends StateNotifier<AsyncValue<void>> {
     required String name,
     required String email,
     required String password,
-    required bool asOwner,
+    bool asOwner = false,
   }) async {
     state = const AsyncValue.loading();
     try {
