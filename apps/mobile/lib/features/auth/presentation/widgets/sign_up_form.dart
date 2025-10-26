@@ -122,7 +122,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           TextButton(
             onPressed: () {
               if (!context.mounted) return;
-              context.push('/auth/owner-register');
+              context.pushNamed('owner-register');
             },
             child: Text(l10n.authOwnerRequestButton),
           ),

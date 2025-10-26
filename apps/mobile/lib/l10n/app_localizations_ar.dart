@@ -171,6 +171,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authOwnerNoSubcategories => 'لا توجد فئات فرعية متاحة بعد. يرجى التواصل مع المشرف.';
 
   @override
+  String get authOwnerCategoryLabel => 'الفئة الرئيسية';
+
+  @override
+  String get authOwnerSubcategoryLabel => 'نوع الخدمة';
+
+  @override
+  String get authOwnerLocationSection => 'موقع النشاط';
+
+  @override
+  String get authOwnerLocationPlaceholder => 'اضغط لاختيار الموقع بدقة';
+
+  @override
+  String get authOwnerLocationRequired => 'يرجى اختيار موقع قبل الإرسال.';
+
+  @override
+  String get authOwnerPickLocation => 'اختيار من الخريطة';
+
+  @override
+  String get authOwnerMapSearchHint => 'ابحث عن عنوان أو مكان';
+
+  @override
+  String get authOwnerUseCurrentLocation => 'استخدم موقعي الحالي';
+
+  @override
+  String get authOwnerConfirmLocation => 'تأكيد الموقع';
+
+  @override
   String get authManageBusiness => 'إدارة نشاطي التجاري';
 
   @override

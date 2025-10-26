@@ -8,4 +8,5 @@ class AppRoutePath {
   static const businessDetails = '/business/:id';
   static const categoryDetails = '/categories/:id';
   static const ownerRegister = '/auth/owner-register';
+  static const ownerLocationPicker = '/auth/owner-location-picker';
 }

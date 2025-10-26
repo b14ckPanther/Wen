@@ -1,16 +1,15 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../businesses/application/business_repository_provider.dart';
 import '../../../location/application/location_controller.dart';
 import '../../application/auth_providers.dart';
+import '../widgets/owner_location_picker_screen.dart';
 
 class OwnerRegisterScreen extends ConsumerStatefulWidget {
   const OwnerRegisterScreen({super.key});
@@ -27,37 +26,15 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _businessNameController = TextEditingController();
   final _businessDescriptionController = TextEditingController();
-  final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   final _websiteController = TextEditingController();
-  final _latController = TextEditingController();
-  final _lngController = TextEditingController();
 
-  String? _selectedCategoryId;
+  String? _selectedParentCategoryId;
+  String? _selectedSubcategoryId;
+  GeoPoint? _selectedLocation;
+  String? _selectedAddress;
+  bool _locationInitialised = false;
   bool _submitting = false;
-  late LatLng _selectedLatLng;
-  Set<Marker> _markers = {};
-  final Completer<GoogleMapController> _mapController = Completer();
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedLatLng = LatLng(
-      kFallbackGeoCenter.latitude,
-      kFallbackGeoCenter.longitude,
-    );
-    _latController.text = _selectedLatLng.latitude.toStringAsFixed(6);
-    _lngController.text = _selectedLatLng.longitude.toStringAsFixed(6);
-    _markers = {
-      Marker(
-        markerId: const MarkerId('business-location'),
-        position: _selectedLatLng,
-        draggable: true,
-        onDragEnd: _onMapPositionChanged,
-      ),
-    };
-    unawaited(_updateAddressFromLatLng(_selectedLatLng));
-  }
 
   @override
   void dispose() {
@@ -67,79 +44,24 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
     _confirmPasswordController.dispose();
     _businessNameController.dispose();
     _businessDescriptionController.dispose();
-    _addressController.dispose();
     _phoneController.dispose();
     _websiteController.dispose();
-    _latController.dispose();
-    _lngController.dispose();
     super.dispose();
-  }
-
-  Future<void> _updateAddressFromLatLng(LatLng position) async {
-    try {
-      final placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-      if (placemarks.isNotEmpty) {
-        final placemark = placemarks.first;
-        final parts = <String?>[
-          placemark.street,
-          placemark.locality,
-          placemark.administrativeArea,
-          placemark.country,
-        ]
-            .whereType<String>()
-            .map((value) => value.trim())
-            .where((value) => value.isNotEmpty)
-            .toList();
-        if (parts.isNotEmpty) {
-          _addressController.text = parts.join(', ');
-        }
-      }
-    } catch (_) {
-      // Ignore reverse geocoding errors.
-    }
-  }
-
-  Future<void> _animateCamera(LatLng target) async {
-    if (!_mapController.isCompleted) return;
-    final controller = await _mapController.future;
-    await controller.animateCamera(CameraUpdate.newLatLng(target));
-  }
-
-  void _onMapPositionChanged(LatLng position) {
-    setState(() {
-      _selectedLatLng = position;
-      _latController.text = position.latitude.toStringAsFixed(6);
-      _lngController.text = position.longitude.toStringAsFixed(6);
-      _markers = {
-        Marker(
-          markerId: const MarkerId('business-location'),
-          position: position,
-          draggable: true,
-          onDragEnd: _onMapPositionChanged,
-        ),
-      };
-    });
-    unawaited(_updateAddressFromLatLng(position));
   }
 
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
-    final lat = double.tryParse(_latController.text.trim());
-    final lng = double.tryParse(_lngController.text.trim());
-    final categoryId = _selectedCategoryId;
-    if (lat == null || lng == null) {
+
+    if (_selectedSubcategoryId == null || _selectedSubcategoryId!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.businessNeedCoordinates)),
+        SnackBar(content: Text(l10n.businessNeedCategory)),
       );
       return;
     }
-    if (categoryId == null || categoryId.isEmpty) {
+    if (_selectedLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.businessNeedCategory)),
+        SnackBar(content: Text(l10n.authOwnerLocationRequired)),
       );
       return;
     }
@@ -160,13 +82,11 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
         ownerId: ownerId,
         name: _businessNameController.text.trim(),
         description: _businessDescriptionController.text.trim(),
-        categoryId: categoryId,
-        location: GeoPoint(lat, lng),
+        categoryId: _selectedSubcategoryId!,
+        location: _selectedLocation!,
         images: const [],
         existing: null,
-        addressLine: _addressController.text.trim().isEmpty
-            ? null
-            : _addressController.text.trim(),
+        addressLine: _selectedAddress,
         phoneNumber: _phoneController.text.trim().isEmpty
             ? null
             : _phoneController.text.trim(),
@@ -177,9 +97,7 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.authOwnerRequestSubmitted),
-        ),
+        SnackBar(content: Text(l10n.authOwnerRequestSubmitted)),
       );
       context.go('/profile');
     } catch (error) {
@@ -197,6 +115,13 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final categoriesAsync = ref.watch(businessCategoriesProvider);
+    final locationState = ref.watch(locationControllerProvider);
+
+    if (!_locationInitialised && locationState.status == LocationStatus.ready) {
+      _locationInitialised = true;
+      final center = locationState.center;
+      _selectedLocation = GeoPoint(center.latitude, center.longitude);
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.authOwnerRequestButton)),
@@ -207,27 +132,25 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
           final orderedCategories = [...categories]..sort((a, b) => a.name.compareTo(b.name));
           final topLevel = orderedCategories
               .where(
-                (category) =>
-                    category.parentId == null || (category.parentId?.isEmpty ?? true),
+                (category) => category.parentId == null || (category.parentId?.isEmpty ?? true),
               )
               .toList();
           final subCategories = orderedCategories
               .where((category) => category.parentId != null && category.parentId!.isNotEmpty)
               .toList();
-          final parentLookup = {
-            for (final category in topLevel) category.id: category.name,
-          };
-          final dropdownEntries = subCategories
-              .map(
-                (sub) => DropdownMenuEntry<String>(
-                  value: sub.id,
-                  label:
-                      '${parentLookup[sub.parentId] ?? l10n.categoriesTitle} • ${sub.name}',
-                ),
-              )
+
+          _selectedParentCategoryId ??= topLevel.isNotEmpty ? topLevel.first.id : null;
+          final availableSubcategories = subCategories
+              .where((category) => category.parentId == _selectedParentCategoryId)
               .toList();
-          if (_selectedCategoryId == null && dropdownEntries.isNotEmpty) {
-            _selectedCategoryId = dropdownEntries.first.value;
+          if (_selectedSubcategoryId == null && availableSubcategories.isNotEmpty) {
+            _selectedSubcategoryId = availableSubcategories.first.id;
+          }
+          if (_selectedSubcategoryId != null &&
+              availableSubcategories.every((category) => category.id != _selectedSubcategoryId)) {
+            _selectedSubcategoryId = availableSubcategories.isNotEmpty
+                ? availableSubcategories.first.id
+                : null;
           }
 
           return SingleChildScrollView(
@@ -245,16 +168,16 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 16),
-                  Text(l10n.authFullNameLabel),
                   TextFormField(
                     controller: _ownerNameController,
+                    decoration: InputDecoration(labelText: l10n.authFullNameLabel),
                     validator: (value) =>
                         value == null || value.isEmpty ? l10n.authNameRequired : null,
                   ),
                   const SizedBox(height: 12),
-                  Text(l10n.authEmailLabel),
                   TextFormField(
                     controller: _emailController,
+                    decoration: InputDecoration(labelText: l10n.authEmailLabel),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) return l10n.authEmailRequired;
@@ -263,9 +186,9 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 12),
-                  Text(l10n.authPasswordLabel),
                   TextFormField(
                     controller: _passwordController,
+                    decoration: InputDecoration(labelText: l10n.authPasswordLabel),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) return l10n.authPasswordRequired;
@@ -274,9 +197,9 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 12),
-                  Text(l10n.authConfirmPasswordLabel),
                   TextFormField(
                     controller: _confirmPasswordController,
+                    decoration: InputDecoration(labelText: l10n.authConfirmPasswordLabel),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -289,14 +212,6 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    l10n.businessUpdateTitle,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _businessNameController,
                     decoration: InputDecoration(labelText: l10n.businessNameLabel),
@@ -312,100 +227,95 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
                     validator: (value) =>
                         value == null || value.isEmpty ? l10n.businessDescriptionLabel : null,
                   ),
-                  const SizedBox(height: 12),
-                  if (dropdownEntries.isEmpty)
+                  const SizedBox(height: 16),
+                  if (topLevel.isEmpty)
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
                         l10n.authOwnerNoSubcategories,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     )
-                  else
-                    DropdownMenu<String>(
-                      initialSelection: _selectedCategoryId,
-                      onSelected: (value) => setState(() => _selectedCategoryId = value),
-                      dropdownMenuEntries: dropdownEntries,
-                      label: Text(l10n.businessCategoryLabel),
-                    ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _addressController,
-                    decoration: InputDecoration(
-                      labelText: l10n.businessAddressLabel,
-                      helperText: l10n.businessAddressHint,
-                    ),
+                  else ...[
+                  DropdownMenu<String>(
+                    initialSelection: _selectedParentCategoryId,
+                    label: Text(l10n.authOwnerCategoryLabel),
+                    onSelected: (value) {
+                      setState(() {
+                        _selectedParentCategoryId = value;
+                        _selectedSubcategoryId = null;
+                      });
+                    },
+                    dropdownMenuEntries: [
+                      for (final category in topLevel)
+                        DropdownMenuEntry(
+                          value: category.id,
+                          label: category.name,
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: SizedBox(
-                      height: 250,
-                      child: GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: _selectedLatLng,
-                          zoom: 14,
+                  DropdownMenu<String>(
+                    initialSelection: _selectedSubcategoryId,
+                    label: Text(l10n.authOwnerSubcategoryLabel),
+                    onSelected: (value) => setState(() => _selectedSubcategoryId = value),
+                    dropdownMenuEntries: [
+                      for (final category in availableSubcategories)
+                        DropdownMenuEntry(
+                          value: category.id,
+                          label: category.name,
                         ),
-                        myLocationEnabled: false,
-                        zoomControlsEnabled: false,
-                        markers: _markers,
-                        onTap: _onMapPositionChanged,
-                        onMapCreated: (controller) {
-                          if (!_mapController.isCompleted) {
-                            _mapController.complete(controller);
+                    ],
+                  ),
+                  ],
+                  const SizedBox(height: 16),
+                  Card(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                    child: ListTile(
+                      leading: const Icon(Icons.place_outlined),
+                      title: Text(
+                        _selectedAddress ?? l10n.authOwnerLocationPlaceholder,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      subtitle: _selectedLocation == null
+                          ? null
+                          : Text(
+                              '${_selectedLocation!.latitude.toStringAsFixed(5)}, '
+                              '${_selectedLocation!.longitude.toStringAsFixed(5)}',
+                            ),
+                      trailing: FilledButton.tonalIcon(
+                        onPressed: () async {
+                          if (!mounted) return;
+                          final initialPosition = _selectedLocation != null
+                              ? LatLng(
+                                  _selectedLocation!.latitude,
+                                  _selectedLocation!.longitude,
+                                )
+                              : LatLng(
+                                  kFallbackGeoCenter.latitude,
+                                  kFallbackGeoCenter.longitude,
+                                );
+                          final result = await context.pushNamed<OwnerLocationPickResult>(
+                            'owner-location-picker',
+                            extra: OwnerLocationPickArgs(
+                              initialPosition: initialPosition,
+                              initialAddress: _selectedAddress,
+                            ),
+                          );
+                          if (result != null && mounted) {
+                            setState(() {
+                              _selectedLocation = GeoPoint(
+                                result.position.latitude,
+                                result.position.longitude,
+                              );
+                              _selectedAddress = result.address;
+                            });
                           }
                         },
+                        icon: const Icon(Icons.map_outlined),
+                        label: Text(l10n.authOwnerPickLocation),
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        _onMapPositionChanged(
-                          LatLng(
-                            kFallbackGeoCenter.latitude,
-                            kFallbackGeoCenter.longitude,
-                          ),
-                        );
-                        unawaited(
-                          _animateCamera(
-                            LatLng(
-                              kFallbackGeoCenter.latitude,
-                              kFallbackGeoCenter.longitude,
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.my_location),
-                      label: Text(l10n.exploreRefreshLocation),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _latController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: l10n.businessLatitudeLabel,
-                            helperText: 'e.g. 25.2048',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _lngController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: l10n.businessLongitudeLabel,
-                            helperText: 'e.g. 55.2708',
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -424,8 +334,7 @@ class _OwnerRegisterScreenState extends ConsumerState<OwnerRegisterScreen> {
                   ),
                   const SizedBox(height: 24),
                   FilledButton.icon(
-                    onPressed:
-                        _submitting || dropdownEntries.isEmpty ? null : _submit,
+                    onPressed: _submitting ? null : _submit,
                     icon: _submitting
                         ? const SizedBox(
                             height: 16,

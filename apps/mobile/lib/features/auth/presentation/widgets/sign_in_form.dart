@@ -106,7 +106,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
                 ? null
                 : () {
                     if (!context.mounted) return;
-                    context.push('/auth/owner-register');
+                    context.pushNamed('owner-register');
                   },
             child: Text(l10n.authOwnerRequestButton),
           ),

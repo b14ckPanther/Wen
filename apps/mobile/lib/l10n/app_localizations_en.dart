@@ -171,6 +171,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authOwnerNoSubcategories => 'No service subcategories are available yet. Please contact an admin.';
 
   @override
+  String get authOwnerCategoryLabel => 'Service category';
+
+  @override
+  String get authOwnerSubcategoryLabel => 'Service type';
+
+  @override
+  String get authOwnerLocationSection => 'Business location';
+
+  @override
+  String get authOwnerLocationPlaceholder => 'Tap to choose a precise location';
+
+  @override
+  String get authOwnerLocationRequired => 'Choose a location before submitting.';
+
+  @override
+  String get authOwnerPickLocation => 'Choose on map';
+
+  @override
+  String get authOwnerMapSearchHint => 'Search address or place';
+
+  @override
+  String get authOwnerUseCurrentLocation => 'Use current location';
+
+  @override
+  String get authOwnerConfirmLocation => 'Confirm location';
+
+  @override
   String get authManageBusiness => 'Manage my business';
 
   @override

@@ -419,6 +419,60 @@ abstract class AppLocalizations {
   /// **'No service subcategories are available yet. Please contact an admin.'**
   String get authOwnerNoSubcategories;
 
+  /// No description provided for @authOwnerCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Service category'**
+  String get authOwnerCategoryLabel;
+
+  /// No description provided for @authOwnerSubcategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Service type'**
+  String get authOwnerSubcategoryLabel;
+
+  /// No description provided for @authOwnerLocationSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Business location'**
+  String get authOwnerLocationSection;
+
+  /// No description provided for @authOwnerLocationPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to choose a precise location'**
+  String get authOwnerLocationPlaceholder;
+
+  /// No description provided for @authOwnerLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a location before submitting.'**
+  String get authOwnerLocationRequired;
+
+  /// No description provided for @authOwnerPickLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose on map'**
+  String get authOwnerPickLocation;
+
+  /// No description provided for @authOwnerMapSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search address or place'**
+  String get authOwnerMapSearchHint;
+
+  /// No description provided for @authOwnerUseCurrentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use current location'**
+  String get authOwnerUseCurrentLocation;
+
+  /// No description provided for @authOwnerConfirmLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm location'**
+  String get authOwnerConfirmLocation;
+
   /// No description provided for @authManageBusiness.
   ///
   /// In en, this message translates to:
