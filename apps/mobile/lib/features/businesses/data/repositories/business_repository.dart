@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
@@ -40,12 +41,15 @@ class BusinessRepository {
     this._firestore, {
     FirebaseStorage? storage,
     FirebaseFunctions? functions,
+    FirebaseAuth? auth,
   })  : _storage = storage ?? FirebaseStorage.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+        _functions = functions ?? FirebaseFunctions.instance,
+        _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
   final FirebaseFunctions _functions;
+  final FirebaseAuth _auth;
 
   CollectionReference<Map<String, dynamic>> get _collection =>
       _firestore.collection('businesses');
@@ -322,13 +326,27 @@ class BusinessRepository {
     try {
       await callable.call({'businessId': businessId});
     } on FirebaseFunctionsException catch (error) {
-      throw Exception('Failed to approve business: ${error.message}');
+      if (error.code == 'unavailable') {
+        await _approveBusinessLocally(businessId);
+      } else {
+        throw Exception('Failed to approve business: ${error.message}');
+      }
     } on MissingPluginException {
-      await _collection.doc(businessId).update({
-        'approved': true,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _approveBusinessLocally(businessId);
     }
     clearCache();
+  }
+
+  Future<void> _approveBusinessLocally(String businessId) async {
+    final updates = <String, dynamic>{
+      'approved': true,
+      'approvedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    final approvingAdminId = _auth.currentUser?.uid;
+    if (approvingAdminId != null && approvingAdminId.isNotEmpty) {
+      updates['approvedBy'] = approvingAdminId;
+    }
+    await _collection.doc(businessId).update(updates);
   }
 }

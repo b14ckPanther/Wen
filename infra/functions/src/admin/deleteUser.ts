@@ -48,15 +48,11 @@ export const deleteUserCallable = functions.https.onCall(
       .where("ownerId", "==", targetUserId)
       .get();
 
-    const batch = db.batch();
-    ownedBusinesses.docs.forEach((doc) => {
-      batch.update(doc.ref, {
-        ownerId: null,
-        approved: false,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-    });
     if (!ownedBusinesses.empty) {
+      const batch = db.batch();
+      ownedBusinesses.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
       await batch.commit();
     }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   GeoPoint,
@@ -12,17 +12,19 @@ import {
   orderBy,
   query,
   serverTimestamp,
-  updateDoc,
+  setDoc,
 } from 'firebase/firestore';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 import { AdminShell } from '../../../components/AdminShell';
 import { useAuth } from '../../../hooks/useAuth';
-import { db } from '../../../lib/firebase';
+import { db, storage } from '../../../lib/firebase';
 
 interface CategoryRow {
   id: string;
   name: string;
   parentId: string | null;
+  imageUrl: string | null;
 }
 
 interface BusinessFormState {
@@ -101,6 +103,10 @@ export default function CatalogPage() {
   const [topCategoryName, setTopCategoryName] = useState('');
   const [subCategoryName, setSubCategoryName] = useState('');
   const [selectedParentId, setSelectedParentId] = useState('');
+  const [topCategoryImage, setTopCategoryImage] = useState<File | null>(null);
+  const [subCategoryImage, setSubCategoryImage] = useState<File | null>(null);
+  const topCategoryFileInputRef = useRef<HTMLInputElement | null>(null);
+  const subCategoryFileInputRef = useRef<HTMLInputElement | null>(null);
   const [businessForm, setBusinessForm] = useState<BusinessFormState>({
     name: '',
     description: '',
@@ -124,6 +130,7 @@ export default function CatalogPage() {
         id: document.id,
         name: (data.name as string) ?? 'Untitled',
         parentId: (data.parentId as string | null) ?? null,
+        imageUrl: (data.imageUrl as string | null) ?? null,
       };
     });
     setCategories(rows);
@@ -219,15 +226,36 @@ export default function CatalogPage() {
 
   const handleAddTopCategory = async () => {
     if (!topCategoryName.trim()) return;
+    if (!topCategoryImage) {
+      setFeedbackTone('error');
+      setFeedback('Select an image for the category.');
+      return;
+    }
+
     setBusy(true);
     try {
-      await addDoc(collection(db, 'categories'), {
+      const categoriesRef = collection(db, 'categories');
+      const newDocRef = doc(categoriesRef);
+      const storageRef = ref(storage, `categories/${newDocRef.id}`);
+      await uploadBytes(storageRef, topCategoryImage, {
+        contentType: topCategoryImage.type || 'image/jpeg',
+      });
+      const imageUrl = await getDownloadURL(storageRef);
+
+      await setDoc(newDocRef, {
         name: topCategoryName.trim(),
         parentId: null,
+        imageUrl,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+
       setTopCategoryName('');
+      setTopCategoryImage(null);
+      if (topCategoryFileInputRef.current) {
+        topCategoryFileInputRef.current.value = '';
+      }
+
       await refreshCategories();
       setFeedbackTone('success');
       setFeedback('Category created.');
@@ -242,15 +270,36 @@ export default function CatalogPage() {
 
   const handleAddSubCategory = async () => {
     if (!subCategoryName.trim() || !selectedParentId) return;
+    if (!subCategoryImage) {
+      setFeedbackTone('error');
+      setFeedback('Select an image for the subcategory.');
+      return;
+    }
+
     setBusy(true);
     try {
-      await addDoc(collection(db, 'categories'), {
+      const categoriesRef = collection(db, 'categories');
+      const newDocRef = doc(categoriesRef);
+      const storageRef = ref(storage, `categories/${newDocRef.id}`);
+      await uploadBytes(storageRef, subCategoryImage, {
+        contentType: subCategoryImage.type || 'image/jpeg',
+      });
+      const imageUrl = await getDownloadURL(storageRef);
+
+      await setDoc(newDocRef, {
         name: subCategoryName.trim(),
         parentId: selectedParentId,
+        imageUrl,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+
       setSubCategoryName('');
+      setSubCategoryImage(null);
+      if (subCategoryFileInputRef.current) {
+        subCategoryFileInputRef.current.value = '';
+      }
+
       await refreshCategories();
       setFeedbackTone('success');
       setFeedback('Subcategory created.');
@@ -272,6 +321,7 @@ export default function CatalogPage() {
     }
     setBusy(true);
     try {
+      await deleteObject(ref(storage, `categories/${categoryId}`)).catch(() => undefined);
       await deleteDoc(doc(db, 'categories', categoryId));
       setCategories((prev) => prev.filter((category) => category.id !== categoryId));
       setFeedbackTone('success');
@@ -288,6 +338,7 @@ export default function CatalogPage() {
   const handleDeleteSubCategory = async (subcategoryId: string) => {
     setBusy(true);
     try {
+      await deleteObject(ref(storage, `categories/${subcategoryId}`)).catch(() => undefined);
       await deleteDoc(doc(db, 'categories', subcategoryId));
       setCategories((prev) => prev.filter((category) => category.id !== subcategoryId));
       setFeedbackTone('success');
@@ -370,13 +421,20 @@ export default function CatalogPage() {
         <p className="mt-1 text-sm text-slate-300">
           Organise services into high-level groups. Subcategories can be added below.
         </p>
-        <div className="mt-4 flex flex-col gap-3 md:flex-row">
+        <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,_1fr)_minmax(0,_1fr)_auto]">
           <input
             type="text"
             value={topCategoryName}
             onChange={(event) => setTopCategoryName(event.target.value)}
             placeholder="e.g. Food & Beverages"
             className="flex-1 rounded-xl border border-white/10 bg-slate-900/60 px-4 py-2 text-sm focus:border-emerald-400 focus:outline-none"
+          />
+          <input
+            ref={topCategoryFileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(event) => setTopCategoryImage(event.target.files?.[0] ?? null)}
+            className="rounded-xl border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-200 file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-500 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-900 hover:file:bg-emerald-400 focus:border-emerald-400 focus:outline-none"
           />
           <button
             onClick={handleAddTopCategory}
@@ -391,16 +449,26 @@ export default function CatalogPage() {
             {topLevelCategories.map((category) => (
               <li
                 key={category.id}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-slate-900/40 px-4 py-2"
+                className="relative overflow-hidden rounded-xl border border-white/10 bg-slate-900/40"
               >
-                <span>{category.name}</span>
-                <button
-                  onClick={() => handleDeleteCategory(category.id)}
-                  disabled={busy}
-                  className="text-xs text-rose-300 transition hover:text-rose-200"
-                >
-                  Delete
-                </button>
+                <div
+                  className={`absolute inset-0 bg-cover bg-center transition ${category.imageUrl ? 'opacity-80' : 'opacity-40'}`}
+                  style={
+                    category.imageUrl
+                      ? { backgroundImage: `url(${category.imageUrl})` }
+                      : { backgroundImage: 'linear-gradient(135deg, rgba(15,118,110,0.5), rgba(14,165,233,0.4))' }
+                  }
+                />
+                <div className="relative flex items-center justify-between gap-4 px-4 py-3">
+                  <span className="font-semibold text-white drop-shadow">{category.name}</span>
+                  <button
+                    onClick={() => handleDeleteCategory(category.id)}
+                    disabled={busy}
+                    className="text-xs text-rose-100 transition hover:text-rose-50"
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -414,7 +482,7 @@ export default function CatalogPage() {
         <p className="mt-1 text-sm text-slate-300">
           Subcategories are selectable by business owners when they register.
         </p>
-        <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,_1fr)_minmax(0,_1fr)_auto]">
+        <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,_1fr)_minmax(0,_1fr)_minmax(0,_1fr)_auto]">
           <select
             value={selectedParentId}
             onChange={(event) => setSelectedParentId(event.target.value)}
@@ -433,6 +501,13 @@ export default function CatalogPage() {
             placeholder="e.g. Fast Food"
             className="rounded-xl border border-white/10 bg-slate-900/60 px-4 py-2 text-sm focus:border-emerald-400 focus:outline-none"
           />
+          <input
+            ref={subCategoryFileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(event) => setSubCategoryImage(event.target.files?.[0] ?? null)}
+            className="rounded-xl border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-200 file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-500 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-900 hover:file:bg-emerald-400 focus:border-emerald-400 focus:outline-none"
+          />
           <button
             onClick={handleAddSubCategory}
             disabled={busy || !selectedParentId}
@@ -447,16 +522,31 @@ export default function CatalogPage() {
             {filteredSubCategories.map((category) => (
               <li
                 key={category.id}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-slate-900/40 px-4 py-2"
+                className="relative overflow-hidden rounded-xl border border-white/10 bg-slate-900/40"
               >
-                <span>{category.name}</span>
-                <button
-                  onClick={() => handleDeleteSubCategory(category.id)}
-                  disabled={busy}
-                  className="text-xs text-rose-300 transition hover:text-rose-200"
-                >
-                  Delete
-                </button>
+                <div
+                  className={`absolute inset-0 bg-cover bg-center transition ${category.imageUrl ? 'opacity-80' : 'opacity-40'}`}
+                  style={
+                    category.imageUrl
+                      ? { backgroundImage: `url(${category.imageUrl})` }
+                      : { backgroundImage: 'linear-gradient(135deg, rgba(15,118,110,0.5), rgba(14,165,233,0.4))' }
+                  }
+                />
+                <div className="relative flex items-center justify-between gap-4 px-4 py-3">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-white drop-shadow">{category.name}</span>
+                    <span className="text-xs text-white/80">
+                      {parentLookup.get(category.parentId ?? '') ?? '—'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteSubCategory(category.id)}
+                    disabled={busy}
+                    className="text-xs text-rose-100 transition hover:text-rose-50"
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
