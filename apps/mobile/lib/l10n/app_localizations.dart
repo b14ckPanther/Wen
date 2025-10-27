@@ -497,6 +497,30 @@ abstract class AppLocalizations {
   /// **'Manage my business'**
   String get authManageBusiness;
 
+  /// No description provided for @authSignInHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get authSignInHeadline;
+
+  /// No description provided for @authSignInHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to resume your personalised Wen experience.'**
+  String get authSignInHint;
+
+  /// No description provided for @authSignUpHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Wen account'**
+  String get authSignUpHeadline;
+
+  /// No description provided for @authSignUpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the community and unlock curated recommendations.'**
+  String get authSignUpHint;
+
   /// No description provided for @authEmailLabel.
   ///
   /// In en, this message translates to:

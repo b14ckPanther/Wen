@@ -210,6 +210,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authManageBusiness => 'Manage my business';
 
   @override
+  String get authSignInHeadline => 'Welcome back';
+
+  @override
+  String get authSignInHint => 'Sign in to resume your personalised Wen experience.';
+
+  @override
+  String get authSignUpHeadline => 'Create your Wen account';
+
+  @override
+  String get authSignUpHint => 'Join the community and unlock curated recommendations.';
+
+  @override
   String get authEmailLabel => 'Email';
 
   @override

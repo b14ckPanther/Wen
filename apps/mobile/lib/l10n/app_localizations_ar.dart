@@ -210,6 +210,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authManageBusiness => 'إدارة نشاطي التجاري';
 
   @override
+  String get authSignInHeadline => 'مرحبًا بعودتك';
+
+  @override
+  String get authSignInHint => 'سجّل الدخول لمتابعة تجربتك المخصصة في وين.';
+
+  @override
+  String get authSignUpHeadline => 'أنشئ حسابك في وين';
+
+  @override
+  String get authSignUpHint => 'انضم إلى المجتمع واحصل على توصيات مختارة بعناية.';
+
+  @override
   String get authEmailLabel => 'البريد الإلكتروني';
 
   @override

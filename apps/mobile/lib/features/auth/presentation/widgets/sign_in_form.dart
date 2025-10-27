@@ -59,11 +59,11 @@ class _SignInFormState extends ConsumerState<SignInForm> {
         filled: true,
         fillColor: theme.colorScheme.surface.withValues(alpha: 0.35),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.15)),
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.18)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.6),
         ),
       );
@@ -74,6 +74,21 @@ class _SignInFormState extends ConsumerState<SignInForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            l10n.authSignInHeadline,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.authSignInHint,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 24),
           TextFormField(
             controller: _emailController,
             decoration: fieldDecoration(l10n.authEmailLabel, Icons.mail_outline),

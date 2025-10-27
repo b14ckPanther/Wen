@@ -18,9 +18,7 @@ class ProfileScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authStateChangesProvider);
     final settings = ref.watch(settingsControllerProvider);
-    final settingsNotifier = ref.read(
-      settingsControllerProvider.notifier,
-    );
+    final settingsNotifier = ref.read(settingsControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -102,30 +100,26 @@ class ProfileScreen extends ConsumerWidget {
                   if (role == 'user') ...[
                     if (isOwnerPending)
                       Card(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .tertiaryContainer,
+                        color: Theme.of(context).colorScheme.tertiaryContainer,
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.hourglass_bottom,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onTertiaryContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onTertiaryContainer,
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   l10n.authOwnerRequestPending,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
+                                  style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onTertiaryContainer,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onTertiaryContainer,
                                       ),
                                 ),
                               ),
@@ -135,29 +129,26 @@ class ProfileScreen extends ConsumerWidget {
                       )
                     else if (isOwnerRejected)
                       Card(
-                        color:
-                            Theme.of(context).colorScheme.errorContainer,
+                        color: Theme.of(context).colorScheme.errorContainer,
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.info_outline,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onErrorContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onErrorContainer,
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   l10n.authOwnerRequestRejected,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
+                                  style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onErrorContainer,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onErrorContainer,
                                       ),
                                 ),
                               ),
@@ -176,8 +167,9 @@ class ProfileScreen extends ConsumerWidget {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content:
-                                        Text(l10n.authOwnerRequestSubmitted),
+                                    content: Text(
+                                      l10n.authOwnerRequestSubmitted,
+                                    ),
                                   ),
                                 );
                               }
@@ -347,90 +339,146 @@ class _AuthFormsCard extends StatelessWidget {
 
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 540),
+        constraints: const BoxConstraints(maxWidth: 580),
         child: DefaultTabController(
           length: 2,
-          child: Container(
-            margin: const EdgeInsets.all(24),
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 36),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(32),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  theme.colorScheme.primary.withValues(alpha: 0.25),
-                  theme.colorScheme.surface.withValues(alpha: 0.75),
-                ],
-              ),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                  blurRadius: 32,
-                  offset: const Offset(0, 24),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.authWelcomeTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.authWelcomeSubtitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: TabBar(
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                    ),
-                    labelColor: theme.colorScheme.primary,
-                    unselectedLabelColor: Colors.white70,
-                    tabs: [
-                      Tab(text: l10n.authSignInTab),
-                      Tab(text: l10n.authSignUpTab),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: ClipPath(
+              clipper: _PrismClipper(),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.colorScheme.primary.withValues(alpha: 0.30),
+                      theme.colorScheme.tertiary.withValues(alpha: 0.12),
+                      theme.colorScheme.surface.withValues(alpha: 0.90),
                     ],
                   ),
-                ),
-                const SizedBox(height: 28),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut,
-                  child: SizedBox(
-                    height: formHeight,
-                    child: const TabBarView(
-                      physics: NeverScrollableScrollPhysics(),
-                      children: [
-                        SingleChildScrollView(child: SignInForm()),
-                        SingleChildScrollView(child: SignUpForm()),
-                      ],
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.22),
+                      blurRadius: 42,
+                      offset: const Offset(0, 28),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: -90,
+                      right: -60,
+                      child: Container(
+                        width: 180,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: theme.colorScheme.primary.withValues(alpha: 0.22),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -70,
+                      left: -50,
+                      child: Container(
+                        width: 220,
+                        height: 220,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: theme.colorScheme.secondary.withValues(alpha: 0.18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            l10n.authWelcomeTitle,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            l10n.authWelcomeSubtitle,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface.withValues(alpha: 0.65),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: TabBar(
+                              indicator: const UnderlineTabIndicator(
+                                borderSide: BorderSide(width: 3, color: Colors.white),
+                                insets: EdgeInsets.symmetric(horizontal: 32),
+                              ),
+                              labelStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                              labelColor: Colors.white,
+                              unselectedLabelColor: Colors.white70,
+                              tabs: [
+                                Tab(text: l10n.authSignInTab.toUpperCase()),
+                                Tab(text: l10n.authSignUpTab.toUpperCase()),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          AnimatedSize(
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeInOut,
+                            child: SizedBox(
+                              height: formHeight,
+                              child: const TabBarView(
+                                physics: NeverScrollableScrollPhysics(),
+                                children: [
+                                  SingleChildScrollView(child: SignInForm()),
+                                  SingleChildScrollView(child: SignUpForm()),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+class _PrismClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    const double notch = 42;
+    final path = Path()
+      ..moveTo(0, notch)
+      ..lineTo(notch * 1.6, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, size.height - notch)
+      ..lineTo(size.width - notch * 1.2, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
